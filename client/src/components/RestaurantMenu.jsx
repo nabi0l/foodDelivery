@@ -1,177 +1,140 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FaStar, FaClock, FaMapMarkerAlt, FaPlus, FaMinus, FaShoppingCart } from 'react-icons/fa';
+import { FaStar, FaClock, FaMapMarkerAlt, FaPlus, FaMinus, FaShoppingCart, FaUtensils } from 'react-icons/fa';
+import axios from 'axios';
 
-// Mock data - replace with API call in a real app
-const mockRestaurant = {
-  id: 1,
-  name: 'Pizza Palace',
-  rating: 4.5,
-  reviewCount: 124,
-  cuisine: 'Italian',
-  deliveryFee: '$2.99',
-  minOrder: '$10',
-  deliveryTime: '30-40 min',
-  address: '123 Pasta Street, Foodie City',
-  hours: '11:00 AM - 10:00 PM',
-  isOpen: true,
-  image: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80',
+// Default restaurant data structure
+const defaultRestaurant = {
+  _id: '',
+  name: 'Loading...',
+  rating: 0,
+  reviewCount: 0,
+  cuisine: 'Loading...',
+  deliveryFee: '$0.00',
+  minOrder: '$0',
+  deliveryTime: '--',
+  address: 'Loading...',
+  location: 'Loading...',
+  hours: '--',
+  isOpen: false,
+  image: 'https://via.placeholder.com/800x400?text=Loading...',
   menu: {
-    categories: [
-      {
-        id: 'starters',
-        name: 'Starters',
-        items: [
-          {
-            id: 1,
-            name: 'Garlic Bread',
-            description: 'Toasted bread with garlic butter and herbs',
-            price: 4.99,
-            image: 'https://images.unsplash.com/photo-1585506942814-ec50f7b785af?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
-            isVegetarian: true,
-            isSpicy: false,
-            customizations: [
-              {
-                id: 'cheese',
-                name: 'Add Cheese',
-                price: 1.50,
-                isSelected: false
-              },
-              {
-                id: 'garlic',
-                name: 'Extra Garlic',
-                price: 0.50,
-                isSelected: false
-              }
-            ]
-          },
-          {
-            id: 2,
-            name: 'Bruschetta',
-            description: 'Toasted bread topped with tomatoes, garlic, and fresh basil',
-            price: 5.99,
-            image: 'https://images.unsplash.com/photo-1628840042765-356cda07504e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1180&q=80',
-            isVegetarian: true,
-            isSpicy: false
-          }
-        ]
-      },
-      {
-        id: 'mains',
-        name: 'Main Courses',
-        items: [
-          {
-            id: 3,
-            name: 'Margherita Pizza',
-            description: 'Classic pizza with tomato sauce, mozzarella, and basil',
-            price: 12.99,
-            image: 'https://images.unsplash.com/photo-1604068549290-dea0e4a305ca?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80',
-            isVegetarian: true,
-            isSpicy: false,
-            customizations: [
-              {
-                id: 'size',
-                name: 'Size',
-                options: [
-                  { id: 'small', name: 'Small', price: 0 },
-                  { id: 'medium', name: 'Medium', price: 2.00 },
-                  { id: 'large', name: 'Large', price: 4.00, isSelected: true }
-                ]
-              },
-              {
-                id: 'toppings',
-                name: 'Toppings',
-                isMultiSelect: true,
-                options: [
-                  { id: 'mushrooms', name: 'Mushrooms', price: 1.50, isSelected: false },
-                  { id: 'pepperoni', name: 'Pepperoni', price: 2.00, isSelected: false },
-                  { id: 'olives', name: 'Olives', price: 1.00, isSelected: false }
-                ]
-              }
-            ]
-          }
-        ]
-      },
-      {
-        id: 'desserts',
-        name: 'Desserts',
-        items: [
-          {
-            id: 4,
-            name: 'Tiramisu',
-            description: 'Classic Italian dessert with coffee-soaked ladyfingers',
-            price: 6.99,
-            image: 'https://images.unsplash.com/photo-1562003389-9023067c2434?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
-            isVegetarian: true,
-            isSpicy: false
-          }
-        ]
-      },
-      {
-        id: 'drinks',
-        name: 'Drinks',
-        items: [
-          {
-            id: 5,
-            name: 'Soft Drink',
-            description: 'Coke, Sprite, Fanta, or Lemonade',
-            price: 2.50,
-            image: 'https://images.unsplash.com/photo-1551024601-bec78aea704c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1064&q=80',
-            customizations: [
-              {
-                id: 'drink',
-                name: 'Select Drink',
-                options: [
-                  { id: 'coke', name: 'Coca-Cola', price: 0 },
-                  { id: 'sprite', name: 'Sprite', price: 0 },
-                  { id: 'fanta', name: 'Fanta', price: 0 },
-                  { id: 'lemonade', name: 'Lemonade', price: 0.50 }
-                ]
-              },
-              {
-                id: 'size',
-                name: 'Size',
-                options: [
-                  { id: 'regular', name: 'Regular', price: 0 },
-                  { id: 'large', name: 'Large', price: 1.00, isSelected: true }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    ]
+    categories: []
   }
 };
 
 const RestaurantMenu = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
-  const [restaurant, setRestaurant] = useState(null);
+  const _navigate = useNavigate();
+  const [restaurant, setRestaurant] = useState(defaultRestaurant);
   const [loading, setLoading] = useState(true);
-  const [activeCategory, setActiveCategory] = useState('starters');
+  const [error, setError] = useState(null);
+  const [activeCategory, setActiveCategory] = useState('');
   const [cart, setCart] = useState([]);
   const [showCart, setShowCart] = useState(false);
-  const [quantities, setQuantities] = useState({});
-  const [customizations, setCustomizations] = useState({});
 
-  // In a real app, fetch restaurant data by ID
   useEffect(() => {
-    const fetchRestaurant = async () => {
+    const fetchRestaurantAndMenu = async () => {
       try {
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 500));
-        setRestaurant(mockRestaurant);
-      } catch (error) {
-        console.error('Error fetching restaurant:', error);
-        navigate('/restaurants');
+        setLoading(true);
+        setError(null);
+        
+        if (!id) {
+          throw new Error('No restaurant ID provided');
+        }
+        
+        // First, try to get the restaurant details
+        const restaurantRes = await axios.get(`http://localhost:5000/api/restaurant/${id}`);
+        
+        if (!restaurantRes.data) {
+          throw new Error('Restaurant not found');
+        }
+        
+        // Then get the menu items for this restaurant
+        const menuRes = await axios.get(`http://localhost:5000/api/menuItem/restaurant/${id}`);
+        
+        // Update restaurant state with fetched data
+        const restaurantData = restaurantRes.data;
+        const updatedRestaurant = {
+          ...restaurantData,
+          deliveryFee: `$${(restaurantData.deliveryFee ?? 0).toFixed(2)}`,
+          minOrder: `$${(restaurantData.minOrder ?? 0).toFixed(2)}`,
+          isOpen: restaurantData.isOpen ?? true, // Use the isOpen status from the database
+          location: restaurantData.location || 'Location not available', // Ensure location is included
+          menu: { categories: [] },
+          rating: restaurantData.rating ?? 0,
+          reviewCount: restaurantData.reviewCount ?? 0,
+          cuisine: restaurantData.cuisine || 'Various',
+          address: restaurantData.location || 'Address not available' // For backward compatibility
+        };
+        
+        // Group menu items by category
+        const categories = {};
+        menuRes.data.forEach(item => {
+          if (!categories[item.category]) {
+            categories[item.category] = [];
+          }
+          categories[item.category].push({
+            ...item,
+            id: item._id,
+            isVegetarian: item.tags?.includes('vegetarian') || false,
+            isSpicy: item.tags?.includes('spicy') || false,
+            customizations: item.options?.map((custGroup, index) => ({
+              id: custGroup.name?.toLowerCase().replace(/\s+/g, '-') || `cust-${index}`,
+              name: custGroup.name || 'Customization',
+              isMultiSelect: custGroup.isMultiSelect || false,
+              options: custGroup.options?.map((opt, optIndex) => ({
+                id: opt.name?.toLowerCase().replace(/\s+/g, '-') || `opt-${optIndex}`,
+                name: opt.name || 'Option',
+                price: opt.price || 0,
+              })) || []
+            })) || []
+          });
+        });
+        
+        // Convert to array format expected by the component
+        const menuCategories = Object.entries(categories).map(([category, items]) => ({
+          id: category.toLowerCase().replace(/\s+/g, '-'),
+          name: category,
+          items: items
+        }));
+        
+        // Set the first category as active if available
+        if (menuCategories.length > 0) {
+          setActiveCategory(menuCategories[0].id);
+        }
+        
+        setRestaurant({
+          ...updatedRestaurant,
+          menu: { categories: menuCategories }
+        });
+        
+      } catch (err) {
+        console.error('Error fetching data:', err);
+        const errorMessage = err.response?.data?.message || 
+                           err.message || 
+                           'Failed to load restaurant data. Please try again later.';
+        
+        setError(errorMessage);
+        setRestaurant({
+          ...defaultRestaurant,
+          name: err.response?.status === 404 ? 'Restaurant Not Found' : 'Error Loading Restaurant',
+          description: errorMessage,
+          image: 'https://via.placeholder.com/800x400?text=Restaurant+Not+Found'
+        });
       } finally {
         setLoading(false);
       }
     };
 
-    fetchRestaurant();
-  }, [id, navigate]);
+    if (id) {
+      fetchRestaurantAndMenu();
+    }
+  }, [id]);
+  const [quantities, setQuantities] = useState({});
+  const [customizations, setCustomizations] = useState({});
+
+
 
   const handleQuantityChange = (itemId, change) => {
     setQuantities(prev => ({
@@ -299,10 +262,35 @@ const RestaurantMenu = () => {
     }, 0).toFixed(2);
   };
 
-  if (loading || !restaurant) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-pulse text-gray-600">Loading menu...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-4">
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg max-w-md w-full">
+          <h3 className="font-bold">Error Loading Restaurant</h3>
+          <p className="text-sm">{error}</p>
+          <button 
+            onClick={() => window.history.back()} 
+            className="mt-2 text-sm text-blue-600 hover:text-blue-800"
+          >
+            &larr; Back to Restaurants
+          </button>
+          <div className="mt-4 p-2 bg-gray-50 rounded text-xs text-gray-600">
+            <p>If you're seeing this error, it might be because:</p>
+            <ul className="list-disc pl-5 mt-1">
+              <li>The restaurant doesn't exist</li>
+              <li>The server might be down</li>
+              <li>There might be a network issue</li>
+            </ul>
+          </div>
+        </div>
       </div>
     );
   }
@@ -438,11 +426,11 @@ const RestaurantMenu = () => {
                                 
                                 {customization.options ? (
                                   <div className="space-y-2">
-                                    {customization.options.map(option => {
+                                    {customization.options.map((option, optionIndex) => {
                                       const isSelected = customizations[item.id]?.[customization.id]?.includes(option.id);
                                       return (
                                         <label 
-                                          key={option.id}
+                                          key={`${item.id}-${customization.id}-${option.id || optionIndex}`}
                                           className={`flex items-center space-x-2 text-sm cursor-pointer ${
                                             isSelected ? 'text-red-600' : 'text-gray-700'
                                           }`}
@@ -597,7 +585,7 @@ const RestaurantMenu = () => {
                       {cartItem.customizations?.length > 0 && (
                         <div className="mt-1 text-sm text-gray-500">
                           {cartItem.customizations.map((customization, idx) => (
-                            <div key={idx}>
+                            <div key={`${cartItem.id}-${customization.id || idx}`}>
                               <span className="font-medium">{customization.name}: </span>
                               {customization.options ? (
                                 <span>{customization.options.map(opt => opt.name).join(', ')}</span>

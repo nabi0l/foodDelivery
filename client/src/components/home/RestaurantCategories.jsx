@@ -29,7 +29,7 @@ const categories = [
   { 
     id: 4, 
     name: 'BBQ', 
-    image: 'https://images.unsplash.com/photo-1558030006-450675392173?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1134&q=80',
+    image: 'https://images.unsplash.com/photo-1508615263227-c5d58c1e5821?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YmJxfGVufDB8fDB8fHww',
     bgColor: 'bg-orange-100', 
     textColor: 'text-orange-600' 
   },
@@ -56,7 +56,7 @@ const categories = [
   },
   { 
     id: 8, 
-    name: 'Cafe', 
+    name: 'Coffee', 
     image: 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1061&q=80',
     bgColor: 'bg-amber-100', 
     textColor: 'text-amber-800' 
@@ -64,14 +64,14 @@ const categories = [
   { 
     id: 9, 
     name: 'Drinks', 
-    image: 'https://images.unsplash.com/photo-1551024601-bec78aea704b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1064&q=80',
+    image: 'https://images.unsplash.com/photo-1481671703460-040cb8a2d909?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8ZHJpbmtzfGVufDB8fDB8fHww',
     bgColor: 'bg-indigo-100', 
     textColor: 'text-indigo-600' 
   },
   { 
     id: 10, 
     name: 'Snacks', 
-    image: 'https://images.unsplash.com/photo-1512152272829-e3139592d56f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80',
+    image: 'https://images.unsplash.com/photo-1566478989037-eec170784d0b?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8c25hY2tzfGVufDB8fDB8fHww',
     bgColor: 'bg-amber-100', 
     textColor: 'text-amber-800' 
   },

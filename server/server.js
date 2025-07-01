@@ -5,6 +5,13 @@ const cors = require('cors');
 
 const app = express();
 
+const UserRoutes = require('./routes/UserRoutes');
+const RestaurantRoutes = require('./routes/RestaurantRoutes');
+const MenuItemRoutes = require('./routes/MenuItemRoutes');
+const CartRoutes = require('./routes/CartRoutes');
+const OrderRoutes = require('./routes/OrderRoutes');
+const PromoCodeRoutes = require('./routes/PromoCodeRoutes');
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -20,9 +27,27 @@ app.get('/', (req, res) => {
 });
 
 // Routes will be added here
+
+//Routes for User
+app.use('/api/user', UserRoutes);
+
+//Routes for Restaurant
+app.use('/api/restaurant', RestaurantRoutes);
+
+//Routes for MenuItem
+app.use('/api/menuItem', MenuItemRoutes);
+
+//Routes for Cart
+app.use('/api/cart', CartRoutes);
+
+//Routes for Order
+app.use('/api/order', OrderRoutes);
+
+//Routes for PromoCode
+app.use('/api/promoCode', PromoCodeRoutes);
+
 // app.use('/api/auth', require('./routes/auth'));
-// app.use('/api/restaurants', require('./routes/restaurants'));
-// app.use('/api/orders', require('./routes/orders'));
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

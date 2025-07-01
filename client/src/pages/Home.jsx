@@ -3,7 +3,7 @@ import '../styles/main.css';
 import HeroSection from '../components/home/HeroSection';
 import RestaurantCategories from '../components/home/RestaurantCategories';
 import PopularRestaurants from '../components/home/PopularRestaurants';
-import PromotionalOffers from '../components/home/PromotionalOffers';
+import SpecialOffers from '../components/home/SpecialOffers';
 import HowItWorks from '../components/home/HowItWorks';
 
 const Home = () => {
@@ -12,7 +12,7 @@ const Home = () => {
       <HeroSection />
       <RestaurantCategories />
       <PopularRestaurants />
-      <PromotionalOffers />
+      <SpecialOffers />
       <HowItWorks />
     </div>
   );

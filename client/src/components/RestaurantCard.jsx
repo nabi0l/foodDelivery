@@ -1,7 +1,8 @@
 
-import { FaStar, FaMotorcycle, FaShoppingBag, FaHeart, FaRegHeart } from 'react-icons/fa';
+import { FaStar, FaMotorcycle, FaShoppingBag, FaHeart, FaRegHeart, FaChevronDown, FaChevronUp, FaUtensils } from 'react-icons/fa';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 const RestaurantCard = ({ restaurant }) => {
   // Default values in case props are not provided
@@ -20,12 +21,33 @@ const RestaurantCard = ({ restaurant }) => {
 
   // Format rating to show one decimal place if needed
   const [isFavorite, setIsFavorite] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [menuItems, setMenuItems] = useState([]);
+  const [loadingMenu, setLoadingMenu] = useState(false);
+  const [error, setError] = useState(null);
   
   useEffect(() => {
     // Load favorite status from localStorage
     const favorites = JSON.parse(localStorage.getItem('favoriteRestaurants') || '[]');
     setIsFavorite(favorites.some(fav => fav.id === id));
   }, [id]);
+
+  const toggleExpand = async () => {
+    if (!isExpanded && menuItems.length === 0) {
+      setLoadingMenu(true);
+      setError(null);
+      try {
+        const response = await axios.get(`http://localhost:5000/api/menuItem/restaurant/${id}`);
+        setMenuItems(response.data);
+      } catch (err) {
+        console.error('Error fetching menu items:', err);
+        setError('Failed to load menu items. Please try again.');
+      } finally {
+        setLoadingMenu(false);
+      }
+    }
+    setIsExpanded(!isExpanded);
+  };
 
   const toggleFavorite = (e) => {
     e.stopPropagation();
@@ -81,12 +103,15 @@ const RestaurantCard = ({ restaurant }) => {
       </div>
       
       {/* Restaurant Info */}
-      <div className="p-4">
+      <div className="p-4 cursor-pointer" onClick={toggleExpand}>
         <div className="flex justify-between items-start mb-2">
           <h3 className="font-semibold text-lg text-gray-900 line-clamp-1">{name}</h3>
-          <span className="text-sm text-green-600 font-medium whitespace-nowrap ml-2">
-            {isOpen ? 'Open Now' : 'Closed'}
-          </span>
+          <div className="flex items-center">
+            <span className="text-sm text-green-600 font-medium whitespace-nowrap mr-2">
+              {isOpen ? 'Open Now' : 'Closed'}
+            </span>
+            {isExpanded ? <FaChevronUp className="text-gray-400" /> : <FaChevronDown className="text-gray-400" />}
+          </div>
         </div>
         
         <p className="text-gray-600 text-sm mb-3">{cuisine}</p>
@@ -135,6 +160,56 @@ const RestaurantCard = ({ restaurant }) => {
           {isOpen ? 'Order Now' : 'Currently Unavailable'}
         </Link>
       </div>
+
+      {/* Menu Items Section */}
+      {isExpanded && (
+        <div className="border-t border-gray-100 px-4 py-3">
+          <h4 className="font-medium text-gray-700 mb-3 flex items-center">
+            <FaUtensils className="mr-2" /> Menu
+          </h4>
+          
+          {loadingMenu ? (
+            <div className="text-center py-4">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-800 mx-auto"></div>
+            </div>
+          ) : error ? (
+            <div className="text-red-500 text-sm text-center py-2">{error}</div>
+          ) : menuItems.length > 0 ? (
+            <div className="space-y-3 max-h-60 overflow-y-auto pr-2">
+              {menuItems.map((item, index) => (
+                <div key={index} className="flex justify-between items-start pb-2 border-b border-gray-100 last:border-0 last:pb-0">
+                  <div className="flex-1">
+                    <h5 className="font-medium text-gray-900">{item.name}</h5>
+                    <p className="text-sm text-gray-500 line-clamp-2">{item.description}</p>
+                    <div className="mt-1">
+                      <span className="text-sm font-medium text-gray-900">${item.price.toFixed(2)}</span>
+                      {item.tags && item.tags.length > 0 && (
+                        <span className="ml-2 text-xs text-gray-500">
+                          {item.tags.slice(0, 2).join(' • ')}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  {item.image && (
+                    <div className="ml-3 flex-shrink-0">
+                      <img 
+                        src={item.image} 
+                        alt={item.name} 
+                        className="w-16 h-16 rounded object-cover"
+                        onError={(e) => {
+                          e.target.src = 'https://via.placeholder.com/64';
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-gray-500 text-sm text-center py-2">No menu items available</div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

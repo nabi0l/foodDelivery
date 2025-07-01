@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import axios from 'axios';
 import { FiFilter, FiClock, FiStar, FiDollarSign, FiChevronDown, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { FaStar, FaRegStar, FaStarHalfAlt } from 'react-icons/fa';
 import RestaurantCard from '../components/RestaurantCard';
@@ -28,23 +29,13 @@ const popularFilters = [
   { id: 'new', label: 'New' },
 ];
 
-// Mock data for restaurants
-const mockRestaurants = Array(12).fill().map((_, i) => ({
-  id: i + 1,
-  name: `Restaurant ${i + 1}`,
-  cuisine: ['Italian', 'Chinese', 'Indian', 'Mexican', 'Japanese'][i % 5],
-  rating: (Math.random() * 1 + 3.5).toFixed(1),
-  reviewCount: Math.floor(Math.random() * 100) + 10,
-  deliveryTime: `${Math.floor(Math.random() * 30) + 15}`,
-  deliveryFee: Math.random() > 0.5 ? 'Free' : `$${(Math.random() * 3 + 1).toFixed(2)}`,
-  minOrder: `$${Math.floor(Math.random() * 10) + 5}`,
-  image: `https://source.unsplash.com/random/300x200?restaurant,${i}`,
-  isOpen: Math.random() > 0.2,
-  tags: ['Promo', 'Discount', 'New'].filter(() => Math.random() > 0.5),
-  priceRange: ['$', '$$', '$$$', '$$$$'][Math.floor(Math.random() * 4)]
-}));
-
 const RestaurantListing = () => {
+  // State for data fetching
+  const [restaurants, setRestaurants] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  // State for filters and pagination
   const [selectedCuisines, setSelectedCuisines] = useState([]);
   const [selectedDelivery, setSelectedDelivery] = useState([]);
   const [selectedFilters, setSelectedFilters] = useState([]);
@@ -54,8 +45,65 @@ const RestaurantListing = () => {
   const [priceRange, setPriceRange] = useState('');
   const [rating, setRating] = useState('');
   const [showFilters, setShowFilters] = useState(false);
-  
-  const restaurantsPerPage = 8;
+
+
+  // Fetch restaurants data
+  useEffect(() => {
+    const fetchRestaurants = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/restaurant/all');
+        // Transform the data to match the expected format
+        const formattedRestaurants = response.data.map(restaurant => ({
+          ...restaurant,
+          id: restaurant._id,
+          cuisine: restaurant.cuisine || 'Various',
+          rating: restaurant.rating || 0,
+          deliveryTime: restaurant.deliveryTime?.toString() || '20-30',
+          deliveryFee: 'Free',
+          minOrder: '$10',
+          image: restaurant.image || `https://source.unsplash.com/random/300x200?restaurant,${restaurant._id}`,
+          isOpen: restaurant.isOpen || false,
+          tags: restaurant.isPopular ? ['Popular'] : [],
+          priceRange: '$$',
+          reviewCount: Math.floor(Math.random() * 100) + 10
+        }));
+        setRestaurants(formattedRestaurants);
+      } catch (err) {
+        console.error('Error fetching restaurants:', err);
+        setError('Failed to load restaurants. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRestaurants();
+  }, []);
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center py-10">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading restaurants...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+            <strong className="font-bold">Error: </strong>
+            <span className="block sm:inline">{error}</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  const restaurantsPerPage = 5;
 
   // Toggle cuisine selection
   const toggleCuisine = (cuisine) => {
@@ -94,7 +142,7 @@ const RestaurantListing = () => {
   };
 
   // Apply filters and sorting
-  const filteredRestaurants = mockRestaurants.filter(restaurant => {
+  const filteredRestaurants = restaurants.filter(restaurant => {
     // Filter by selected cuisines
     if (selectedCuisines.length > 0 && !selectedCuisines.includes(restaurant.cuisine)) {
       return false;
