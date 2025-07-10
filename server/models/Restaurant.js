@@ -20,6 +20,7 @@ const restaurantSchema = new Schema({
     isOpen: Boolean,
     isPopular: Boolean,
     location: String,
+    country: String, // Added country field
     createdAt: Date,
     updatedAt: Date
 }, {

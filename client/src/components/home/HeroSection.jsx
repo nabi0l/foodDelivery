@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import React, { useState } from "react";
 import { FaMapMarkerAlt, FaSearch, FaArrowRight } from 'react-icons/fa';
 
 const HeroSection = () => {
   const [address, setAddress] = useState('');
   const [isFocused, setIsFocused] = useState(false);
+  const [topRestaurants, setTopRestaurants] = useState([]);
 
   const popularSearches = [
     { id: 1, name: 'Pizza', emoji: '🍕' },
@@ -11,6 +12,29 @@ const HeroSection = () => {
     { id: 3, name: 'Sushi', emoji: '🍣' },
     { id: 4, name: 'Pasta', emoji: '🍝' },
   ];
+
+  const handleMapIconClick = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          // Call a function to filter restaurants
+          fetchNearbyRestaurants(latitude, longitude);
+        },
+        (error) => {
+          alert("Location access denied or unavailable.");
+        }
+      );
+    } else {
+      alert("Geolocation is not supported by this browser.");
+    }
+  };
+
+  const fetchNearbyRestaurants = (latitude, longitude) => {
+    fetch(`/api/restaurants/nearby?lat=${latitude}&lng=${longitude}`)
+      .then(res => res.json())
+      .then(data => setTopRestaurants(data));
+  };
 
   return (
     <div className="relative min-h-[600px] bg-gradient-to-r from-red-50 to-red-100 flex items-center overflow-hidden">
@@ -56,6 +80,8 @@ const HeroSection = () => {
             </div>
           </div>
           
+          {/* Insert MapView here */}
+
           <div className="mt-8">
             <p className="text-sm text-gray-500 mb-3">POPULAR SEARCHES:</p>
             <div className="flex flex-wrap justify-center gap-3">

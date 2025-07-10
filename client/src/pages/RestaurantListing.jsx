@@ -4,31 +4,6 @@ import { FiFilter, FiClock, FiStar, FiDollarSign, FiChevronDown, FiChevronLeft, 
 import { FaStar, FaRegStar, FaStarHalfAlt } from 'react-icons/fa';
 import RestaurantCard from '../components/RestaurantCard';
 
-// Sample data
-const cuisines = [
-  { id: 1, name: 'Italian', count: 45 },
-  { id: 2, name: 'Chinese', count: 32 },
-  { id: 3, name: 'Indian', count: 28 },
-  { id: 4, name: 'Mexican', count: 24 },
-  { id: 5, name: 'Japanese', count: 19 },
-  { id: 6, name: 'American', count: 38 },
-  { id: 7, name: 'Thai', count: 15 },
-  { id: 8, name: 'Mediterranean', count: 12 },
-];
-
-const deliveryOptions = [
-  { id: 'free', label: 'Free Delivery' },
-  { id: 'fast', label: 'Fast Delivery' },
-  { id: 'open', label: 'Open Now' },
-];
-
-const popularFilters = [
-  { id: 'rating', label: 'Rating 4.0+' },
-  { id: 'promo', label: 'Promo' },
-  { id: 'discount', label: 'Discount' },
-  { id: 'new', label: 'New' },
-];
-
 const RestaurantListing = () => {
   // State for data fetching
   const [restaurants, setRestaurants] = useState([]);
@@ -46,6 +21,10 @@ const RestaurantListing = () => {
   const [rating, setRating] = useState('');
   const [showFilters, setShowFilters] = useState(false);
 
+  // Sample data
+  const [cuisines, setCuisines] = useState([]);
+  const [deliveryOptions, setDeliveryOptions] = useState([]);
+  const [popularFilters, setPopularFilters] = useState([]);
 
   // Fetch restaurants data
   useEffect(() => {
@@ -77,6 +56,27 @@ const RestaurantListing = () => {
     };
 
     fetchRestaurants();
+  }, []);
+
+  // Fetch filter data from backend
+  useEffect(() => {
+    // Fetch cuisines
+    axios.get('http://localhost:5000/api/restaurant/cuisines')
+      .then(res => setCuisines(res.data.map((c, i) => ({ id: i, name: c }))))
+      .catch(() => setCuisines([]));
+
+    // Fetch delivery options
+    axios.get('http://localhost:5000/api/menuitem/delivery-options')
+      .then(res => setDeliveryOptions(res.data.map((d, i) => ({ id: d, label: d.charAt(0).toUpperCase() + d.slice(1).replace('-', ' ') }))))
+      .catch(() => setDeliveryOptions([]));
+
+    // Fetch popular filters
+    axios.get('http://localhost:5000/api/menuitem/popular-filters')
+      .then(res => setPopularFilters(res.data.map((f, i) => ({
+        id: f,
+        label: f === 'rating' ? 'Rating 4.0+' : f.charAt(0).toUpperCase() + f.slice(1)
+      }))))
+      .catch(() => setPopularFilters([]));
   }, []);
   if (loading) {
     return (
@@ -313,17 +313,14 @@ const RestaurantListing = () => {
               <h4 className="font-medium text-gray-900 mb-2">Cuisines</h4>
               <div className="space-y-2">
                 {cuisines.map(cuisine => (
-                  <label key={cuisine.id} className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        className="rounded text-red-600 focus:ring-red-500"
-                        checked={selectedCuisines.includes(cuisine.name)}
-                        onChange={() => toggleCuisine(cuisine.name)}
-                      />
-                      <span className="ml-2 text-sm text-gray-700">{cuisine.name}</span>
-                    </div>
-                    <span className="text-xs text-gray-500">{cuisine.count}</span>
+                  <label key={cuisine.id} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      className="rounded text-red-600 focus:ring-red-500"
+                      checked={selectedCuisines.includes(cuisine.name)}
+                      onChange={() => toggleCuisine(cuisine.name)}
+                    />
+                    <span className="ml-2 text-sm text-gray-700">{cuisine.name}</span>
                   </label>
                 ))}
               </div>

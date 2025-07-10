@@ -3,6 +3,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 
+const axios = require('axios');
+
 const app = express();
 
 const UserRoutes = require('./routes/UserRoutes');
@@ -25,6 +27,20 @@ mongoose.connect(process.env.MONGODB_URI)
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome to Food Delivery API' });
 });
+
+//api of geolocation
+async function getGeoLocation(ip) {
+  const apiKey=process.env.IPGEOLOCATION_API_KEY;
+  const url = `https://api.ipgeolocation.io/ipgeo?apiKey=${apiKey}&ip=${ip}`;
+  const response= await axios.get(url);
+  return{
+    latitude: parseFloat(response.data.latitude),
+    longitude: parseFloat(response.data.longitude),
+    city: response.data.city,
+    country: response.data.country_name
+  }
+  
+}
 
 // Routes will be added here
 

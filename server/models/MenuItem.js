@@ -25,7 +25,9 @@ const menuItemSchema = new Schema({
     isAvailable: Boolean,
     createdAt: Date,
     updatedAt: Date,
-    options: Array
+    options: Array,
+    deliveryOptions: [String],
+    popularFilters: [String],
 }, {
     timestamps: true
 });

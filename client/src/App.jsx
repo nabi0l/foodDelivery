@@ -1,4 +1,5 @@
 import './styles/main.css';
+import 'leaflet/dist/leaflet.css';
 
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/MainNavbar';

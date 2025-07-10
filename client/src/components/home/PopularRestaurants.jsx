@@ -48,6 +48,7 @@ const PopularRestaurants = () => {
       </section>
     );
   }
+
   return (
     <section className="py-16 px-4 bg-gray-50">
       <div className="container mx-auto">
@@ -61,7 +62,7 @@ const PopularRestaurants = () => {
           </Link>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
           {restaurants.length > 0 ? (
             restaurants.map((restaurant) => (
             <div

@@ -3,6 +3,25 @@ const router = express.Router();
 
 const MenuItem = require('../models/MenuItem');
 
+// Place custom filter routes BEFORE any parameterized routes
+router.get('/delivery-options', async (req, res) => {
+  try {
+    const options = await MenuItem.distinct('deliveryOptions');
+    res.json(options);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+router.get('/popular-filters', async (req, res) => {
+  try {
+    const filters = await MenuItem.distinct('popularFilters');
+    res.json(filters);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Get all menu items or filter by restaurant ID
 router.get('/', async (req, res) => {
     try {
@@ -105,7 +124,6 @@ router.delete('/item/:itemId', async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 });
-
 
 
 module.exports = router;
