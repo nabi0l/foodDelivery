@@ -1,55 +1,150 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import { FaUtensils, FaMotorcycle, FaCheckCircle } from 'react-icons/fa';
+import { FaUtensils, FaMotorcycle, FaCheckCircle, FaSpinner, FaExclamationCircle } from 'react-icons/fa';
+import axios from 'axios';
 
 const Orders = () => {
-  // Mock order data
-  const orders = [
-    {
-      id: 'ORD-12345',
-      date: 'June 30, 2025',
-      restaurant: 'Pizza Palace',
-      status: 'Delivered',
-      items: [
-        { name: 'Margherita Pizza', quantity: 1, price: 12.99 },
-        { name: 'Garlic Bread', quantity: 2, price: 4.99 }
-      ],
-      total: 22.97,
-      deliveryAddress: '123 Main St, City, Country',
-      estimatedDelivery: '30-40 min'
-    },
-    {
-      id: 'ORD-12344',
-      date: 'June 29, 2025',
-      restaurant: 'Burger Barn',
-      status: 'Delivered',
-      items: [
-        { name: 'Classic Burger', quantity: 1, price: 8.99 },
-        { name: 'French Fries', quantity: 1, price: 3.99 },
-        { name: 'Soda', quantity: 1, price: 2.50 }
-      ],
-      total: 15.48,
-      deliveryAddress: '123 Main St, City, Country',
-      estimatedDelivery: '25-35 min'
-    }
-  ];
+  const [cart, setCart] = useState(null);
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    deliveryAddress: '',
+    specialInstructions: '',
+    paymentMethod: 'cash_on_delivery'
+  });
+  const location = useLocation();
+  const orderSuccess = location.state?.orderSuccess;
+  const newOrderId = location.state?.newOrderId;
+
+  useEffect(() => {
+    const fetchCart = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const userId = localStorage.getItem('userId');
+        if (userId) {
+          const response = await axios.get(`http://localhost:5000/api/cart/user/${userId}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          });
+          if (response.data.success) {
+            setCart(response.data.data);
+          }
+        }
+      } catch (err) {
+        if (err.response && err.response.status === 404) {
+          setCart(null);
+        } else {
+          console.error('Error fetching cart in Orders page:', err);
+        }
+      }
+    };
+    fetchCart();
+    const fetchOrders = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const token = localStorage.getItem('token');
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+          setOrders([]);
+          setLoading(false);
+          return;
+        }
+        const response = await axios.get(`http://localhost:5000/api/order?userId=${userId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        if (Array.isArray(response.data)) {
+          setOrders(response.data);
+        } else {
+          setOrders([]);
+        }
+      } catch (err) {
+        console.error('Error fetching orders:', err);
+        const errorMessage = err.response?.data?.message || err.message || 'Failed to load orders. Please try again later.';
+        setError(errorMessage);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, []);
+
+  const _formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
 
   const getStatusIcon = (status) => {
-    switch (status.toLowerCase()) {
+    const statusLower = (status || '').toLowerCase();
+    switch (statusLower) {
       case 'delivered':
         return <FaCheckCircle className="text-green-500 mr-2" />;
       case 'preparing':
         return <FaUtensils className="text-yellow-500 mr-2" />;
       case 'on the way':
+      case 'out for delivery':
         return <FaMotorcycle className="text-blue-500 mr-2" />;
       default:
-        return null;
+        return <FaUtensils className="text-gray-500 mr-2" />;
     }
   };
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <FaSpinner className="animate-spin text-4xl text-blue-500" />
+        <span className="ml-2 text-lg">Loading your orders...</span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <FaExclamationCircle className="text-red-500 text-5xl mx-auto mb-4" />
+          <p className="text-xl text-gray-700">{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
+      {cart && cart.items && cart.items.length > 0 && (
+        <div className="bg-white shadow-lg rounded-lg p-6 mb-8">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">Your Current Cart</h2>
+          <button 
+            onClick={() => navigate('/checkout')}
+            className="w-full bg-red-600 text-white py-3 rounded-md font-semibold hover:bg-red-700 transition-colors text-lg"
+          >
+            Proceed to Checkout (${(cart.totalPrice + 2.99).toFixed(2)})
+          </button>
+        </div>
+      )}
       <h1 className="text-3xl font-bold text-gray-800 mb-8">My Orders</h1>
+      
+      {orderSuccess && (
+        <div className="mb-6 p-4 bg-green-100 text-green-800 rounded">
+          Order placed successfully! 🎉
+          {newOrderId && <div>Your order ID: {newOrderId}</div>}
+        </div>
+      )}
       
       {orders.length === 0 ? (
         <div className="text-center py-12">
@@ -73,7 +168,9 @@ const Orders = () => {
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                   <div className="mb-2 sm:mb-0">
                     <h3 className="font-medium text-gray-900">Order #{order.id}</h3>
-                    <p className="text-sm text-gray-500">{order.date}</p>
+                    <div className="text-sm text-gray-500">
+                      {order._id} • {_formatDate(order.createdAt)}
+                    </div>
                   </div>
                   <div className="flex items-center">
                     {getStatusIcon(order.status)}
@@ -85,15 +182,11 @@ const Orders = () => {
               <div className="p-4 border-b border-gray-100">
                 <h4 className="font-medium text-gray-900 mb-2">{order.restaurant}</h4>
                 <ul className="space-y-2">
-                  {order.items.map((item, index) => (
-                    <li key={index} className="flex justify-between text-sm">
-                      <span className="text-gray-700">
-                        {item.quantity}x {item.name}
-                      </span>
-                      <span className="text-gray-900">
-                        ${(item.quantity * item.price).toFixed(2)}
-                      </span>
-                    </li>
+                  {order.items?.map((item, itemIndex) => (
+                    <div key={itemIndex} className="flex justify-between py-1">
+                      <span>{item.quantity}x {item.name || 'Item'}</span>
+                      <span>${(item.price * item.quantity).toFixed(2)}</span>
+                    </div>
                   ))}
                 </ul>
               </div>
@@ -103,13 +196,14 @@ const Orders = () => {
                   <p className="text-sm text-gray-600">
                     <span className="font-medium">Delivery to:</span> {order.deliveryAddress}
                   </p>
-                  <p className="text-sm text-gray-600">
-                    <span className="font-medium">Estimated delivery:</span> {order.estimatedDelivery}
-                  </p>
+                  <div className="text-sm text-gray-600">
+                    <div>Order Status: {order.deliveryStatus || 'Processing'}</div>
+                    <div>Payment Status: {order.paymentStatus || 'Pending'}</div>
+                  </div>
                 </div>
                 <div className="text-right">
                   <p className="text-sm text-gray-600">Total Amount</p>
-                  <p className="text-lg font-bold text-gray-900">${order.total.toFixed(2)}</p>
+                  <div className="font-semibold">Total: ${order.totalPrice?.toFixed(2) || '0.00'}</div>
                 </div>
               </div>
               

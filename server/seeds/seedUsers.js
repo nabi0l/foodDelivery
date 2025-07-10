@@ -22,39 +22,17 @@ const connectDB = async () => {
 const users = [
   {
     name: 'Admin User',
-    email: 'admin@example.com',
-    password: 'admin123', // Will be hashed
-    phone: '+1234567890',
-    address: '123 Admin St, Admin City',
+    email: 'labi44347@gmail.com',
+    password: 'pass12345',
+    address: 'Admin Address',
     role: 'admin',
-    isVerified: true,
-  },
-  {
-    name: 'John Doe',
-    email: 'john@example.com',
-    password: 'password123', // Will be hashed
-    phone: '+1987654321',
-    address: '456 User Ave, User City',
-    role: 'user',
-    isVerified: true,
-  },
-  {
-    name: 'Jane Smith',
-    email: 'jane@example.com',
-    password: 'password123', // Will be hashed
-    phone: '+1122334455',
-    address: '789 Customer Rd, Customer Town',
-    role: 'user',
-    isVerified: true,
   },
   {
     name: 'Restaurant Owner',
-    email: 'owner@example.com',
-    password: 'owner123', // Will be hashed
-    phone: '+1555666777',
-    address: '101 Business Blvd, Business City',
+    email: 'ebbabi98@gmail.com',
+    password: 'pasw1234',
+    address: 'Restaurant Address',
     role: 'restaurant_owner',
-    isVerified: true,
   },
 ];
 
@@ -85,7 +63,7 @@ async function seedUsers() {
     return createdUsers;
   } catch (error) {
     console.error('Error seeding users:', error);
-    throw error;
+    return [];
   } finally {
     // Only close the connection if this script is run directly
     if (process.argv[1].includes('seedUsers.js')) {

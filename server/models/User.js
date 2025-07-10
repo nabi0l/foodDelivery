@@ -11,7 +11,7 @@ const userSchema = new Schema({
     name: String,
     email: String,
     password: String,
-    role: String,
+    role: { type: String, enum: ['user', 'restaurant_owner', 'admin'], default: 'user' },
     address: String,
     createdAt: Date,
     updatedAt: Date

@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
 import { FaStar, FaClock, FaMapMarkerAlt, FaPlus, FaMinus, FaShoppingCart, FaUtensils } from 'react-icons/fa';
 import axios from 'axios';
 
@@ -30,7 +33,7 @@ const RestaurantMenu = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeCategory, setActiveCategory] = useState('');
-  const [cart, setCart] = useState([]);
+  const { cart, addToCart: addToCartContext, removeFromCart: removeFromCartContext, updateCartItemQuantity: updateCartItemQuantityContext } = useCart();
   const [showCart, setShowCart] = useState(false);
 
   useEffect(() => {
@@ -220,23 +223,18 @@ const RestaurantMenu = () => {
       restaurantName: restaurant.name
     };
 
-    setCart(prev => [...prev, cartItem]);
+    addToCartContext(cartItem);
     setQuantities(prev => ({ ...prev, [item.id]: 0 }));
+    toast.success('Item added to cart!');
     setShowCart(true);
   };
 
   const removeFromCart = (itemId) => {
-    setCart(prev => prev.filter(item => item.id !== itemId));
+    removeFromCartContext(itemId);
   };
 
   const updateCartItemQuantity = (itemId, change) => {
-    setCart(prev => 
-      prev.map(item => 
-        item.id === itemId 
-          ? { ...item, quantity: Math.max(1, item.quantity + change) }
-          : item
-      )
-    );
+    updateCartItemQuantityContext(itemId, change);
   };
 
   const calculateItemTotal = (item) => {
@@ -296,6 +294,18 @@ const RestaurantMenu = () => {
   }
 
   return (
+    <>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     <div className="bg-gray-50 min-h-screen pb-24">
       {/* Restaurant Header */}
       <div className="bg-white shadow-sm">
@@ -667,6 +677,7 @@ const RestaurantMenu = () => {
         </button>
       )}
     </div>
+    </>
   );
 };
 

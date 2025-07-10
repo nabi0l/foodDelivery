@@ -1,9 +1,19 @@
-import React from 'react';
-import { Link, NavLink } from 'react-router-dom';
-import { FaMotorcycle } from 'react-icons/fa';
+import React, { useState } from 'react';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { FaMotorcycle, FaUser } from 'react-icons/fa';
 import { FiMenu } from 'react-icons/fi';
 
 const MainNavbar = () => {
+  const [showDropdown, setShowDropdown] = useState(false);
+  const navigate = useNavigate();
+  const isLoggedIn = Boolean(localStorage.getItem('token'));
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setShowDropdown(false);
+    navigate('/');
+  };
+
   return (
     <nav className="bg-white shadow-md">
       <div className="container mx-auto px-4">
@@ -51,6 +61,7 @@ const MainNavbar = () => {
               >
                 Favorites
               </NavLink>
+
               <NavLink 
                 to="/contact" 
                 className={({ isActive }) => 
@@ -62,20 +73,50 @@ const MainNavbar = () => {
             </div>
           </div>
 
-          {/* Auth Buttons - Desktop */}
+          {/* Auth/User Icon - Desktop */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link 
-              to="/login" 
-              className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-red-600"
-            >
-              Login
-            </Link>
-            <Link 
-              to="/signup" 
-              className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
-            >
-              Sign Up
-            </Link>
+            {isLoggedIn ? (
+              <div className="relative">
+                <button
+                  className="flex items-center focus:outline-none"
+                  onClick={() => setShowDropdown((prev) => !prev)}
+                >
+                  <FaUser className="h-6 w-6 text-red-600" />
+                </button>
+                {showDropdown && (
+                  <div className="absolute right-0 mt-2 w-32 bg-white border rounded shadow-lg z-10">
+                    <Link
+                      to="/user-profile"
+                      className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50"
+                      onClick={() => setShowDropdown(false)}
+                    >
+                      Profile
+                    </Link>
+                    <button
+                      className="block w-full text-left px-4 py-2 text-gray-700 hover:bg-red-50"
+                      onClick={handleLogout}
+                    >
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <>
+                <Link 
+                  to="/login" 
+                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-red-600"
+                >
+                  Login
+                </Link>
+                <Link 
+                  to="/signup" 
+                  className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -107,12 +148,23 @@ const MainNavbar = () => {
           </Link>
           <div className="border-t border-gray-200 pt-4 pb-3">
             <div className="flex space-x-4">
-              <Link to="/login" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-red-600">
-                Login
-              </Link>
-              <Link to="/signup" className="block px-3 py-2 rounded-md text-base font-medium text-white bg-red-600 hover:bg-red-700">
-                Sign Up
-              </Link>
+              {isLoggedIn ? (
+                <button
+                  className="flex items-center px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-red-600"
+                  onClick={handleLogout}
+                >
+                  <FaUser className="h-6 w-6 mr-1" /> Logout
+                </button>
+              ) : (
+                <>
+                  <Link to="/login" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-red-600">
+                    Login
+                  </Link>
+                  <Link to="/signup" className="block px-3 py-2 rounded-md text-base font-medium text-white bg-red-600 hover:bg-red-700">
+                    Sign Up
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>

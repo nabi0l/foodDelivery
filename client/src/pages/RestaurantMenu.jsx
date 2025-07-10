@@ -1,143 +1,178 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
-import { FiClock, FiStar, FiArrowLeft } from 'react-icons/fi';
+import { FaSpinner, FaExclamationCircle, FaArrowLeft, FaShoppingCart, FaStar } from 'react-icons/fa';
+import { toast } from 'react-toastify';
 
 const RestaurantMenu = () => {
-    const { restaurantId } = useParams();
-    const navigate = useNavigate();
-    const [restaurant, setRestaurant] = useState(null);
-    const [menuItems, setMenuItems] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
+  const { restaurantId } = useParams();
+  const [restaurant, setRestaurant] = useState(null);
+  const [menuItems, setMenuItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [quantities, setQuantities] = useState({});
 
-    useEffect(() => {
-        const fetchRestaurantAndMenu = async () => {
-            try {
-                setLoading(true);
-                // Fetch restaurant details and menu items in parallel
-                const [restaurantRes, menuRes] = await Promise.all([
-                    axios.get(`http://localhost:5000/api/restaurant/${restaurantId}`),
-                    axios.get(`http://localhost:5000/api/menuItem/restaurant/${restaurantId}`)
-                ]);
-                
-                setRestaurant(restaurantRes.data);
-                setMenuItems(menuRes.data);
-            } catch (err) {
-                console.error('Error fetching data:', err);
-                setError('Failed to load restaurant menu. Please try again later.');
-            } finally {
-                setLoading(false);
-            }
-        };
+  useEffect(() => {
+    const fetchRestaurantDetails = async () => {
+      try {
+        setLoading(true);
+        setError('');
 
-        fetchRestaurantAndMenu();
-    }, [restaurantId]);
+        const restaurantRes = await axios.get(`http://localhost:5000/api/restaurants/${restaurantId}`);
+        if (restaurantRes.data) {
+          setRestaurant(restaurantRes.data);
+        } else {
+          setError('Restaurant not found.');
+        }
 
-    if (loading) {
-        return (
-            <div className="min-h-screen bg-gray-50 p-4">
-                <div className="max-w-4xl mx-auto py-8">
-                    <div className="animate-pulse space-y-8">
-                        <div className="h-8 bg-gray-200 rounded w-1/3"></div>
-                        <div className="space-y-4">
-                            {[...Array(5)].map((_, i) => (
-                                <div key={i} className="h-24 bg-gray-200 rounded"></div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
+        const menuRes = await axios.get(`http://localhost:5000/api/menu-items/restaurant/${restaurantId}`);
+        if (menuRes.data) {
+          setMenuItems(menuRes.data);
+          // Initialize quantities for each menu item to 1
+          const initialQuantities = menuRes.data.reduce((acc, item) => {
+            acc[item._id] = 1;
+            return acc;
+          }, {});
+          setQuantities(initialQuantities);
+        }
+
+      } catch (err) {
+        console.error('Error fetching restaurant details:', err);
+        const errorMessage = err.response?.data?.message || 'Failed to load restaurant details.';
+        setError(errorMessage);
+        toast.error(errorMessage);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRestaurantDetails();
+  }, [restaurantId]);
+
+  const handleQuantityChange = (itemId, value) => {
+    const quantity = parseInt(value, 10);
+    setQuantities(prev => ({
+      ...prev,
+      [itemId]: quantity >= 1 ? quantity : 1, // Ensure quantity is at least 1
+    }));
+  };
+
+  const handleAddToCart = async (menuItem) => {
+    const token = localStorage.getItem('token');
+    const userId = localStorage.getItem('userId');
+
+    if (!token || !userId) {
+      toast.error('Please log in to add items to your cart.');
+      return;
     }
 
-    if (error) {
-        return (
-            <div className="min-h-screen bg-gray-50 p-4">
-                <div className="max-w-4xl mx-auto py-8">
-                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-                        {error}
-                    </div>
-                    <button 
-                        onClick={() => window.location.reload()}
-                        className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                    >
-                        Retry
-                    </button>
-                </div>
-            </div>
-        );
-    }
+    const quantity = quantities[menuItem._id] || 1;
 
+    try {
+      const response = await axios.post('http://localhost:5000/api/cart',
+        {
+          userId,
+          restaurantId: menuItem.restaurantId,
+          items: [{ 
+            menuItemId: menuItem._id, 
+            name: menuItem.name, 
+            price: menuItem.price, 
+            quantity 
+          }]
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (response.data.success) {
+        toast.success(`${menuItem.name} added to cart!`);
+      } else {
+        toast.error(response.data.message || 'Failed to add item to cart.');
+      }
+    } catch (err) {
+      console.error('Error adding to cart:', err);
+      const errorMessage = err.response?.data?.message || 'Failed to add item to cart.';
+      toast.error(errorMessage);
+    }
+  };
+
+  if (loading) {
     return (
-        <div className="min-h-screen bg-gray-50">
-            {/* Header with back button */}
-            <header className="bg-white shadow-sm sticky top-0 z-10">
-                <div className="max-w-4xl mx-auto px-4 py-4 flex items-center">
-                    <button 
-                        onClick={() => navigate(-1)}
-                        className="p-2 rounded-full hover:bg-gray-100 mr-4"
-                    >
-                        <FiArrowLeft className="w-6 h-6" />
-                    </button>
-                    <h1 className="text-xl font-bold text-gray-900">
-                        {restaurant?.name || 'Restaurant Menu'}
-                    </h1>
-                </div>
-            </header>
-
-            {/* Restaurant Info */}
-            <div className="max-w-4xl mx-auto px-4 py-6">
-                <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">{restaurant?.name}</h2>
-                    <div className="flex items-center text-gray-600 mb-2">
-                        <FiStar className="text-yellow-400 mr-1" />
-                        <span className="font-medium">{restaurant?.rating || 'N/A'}</span>
-                        <span className="mx-2">•</span>
-                        <span>{restaurant?.cuisine || 'Various Cuisine'}</span>
-                    </div>
-                    <div className="flex items-center text-gray-600">
-                        <FiClock className="mr-1" />
-                        <span>{restaurant?.deliveryTime || '20-30'} min</span>
-                        <span className="mx-2">•</span>
-                        <span>Free Delivery</span>
-                    </div>
-                </div>
-
-                {/* Menu Items */}
-                <div className="space-y-6">
-                    <h3 className="text-xl font-semibold text-gray-900">Menu</h3>
-                    
-                    {menuItems.length === 0 ? (
-                        <div className="text-center py-8">
-                            <p className="text-gray-500">No menu items available at the moment.</p>
-                        </div>
-                    ) : (
-                        <div className="space-y-4">
-                            {menuItems.map((item) => (
-                                <div key={item._id} className="bg-white rounded-lg shadow-sm p-4 flex justify-between items-start">
-                                    <div className="flex-1">
-                                        <h4 className="font-medium text-gray-900">{item.name}</h4>
-                                        <p className="text-sm text-gray-600 mt-1">{item.description}</p>
-                                        <p className="text-lg font-semibold text-gray-900 mt-2">${item.price?.toFixed(2)}</p>
-                                    </div>
-                                    {item.image && (
-                                        <div className="ml-4">
-                                            <img 
-                                                src={item.image} 
-                                                alt={item.name}
-                                                className="w-20 h-20 object-cover rounded"
-                                            />
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
-            </div>
-        </div>
+      <div className="flex items-center justify-center min-h-screen">
+        <FaSpinner className="animate-spin text-4xl text-blue-500" />
+      </div>
     );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8 text-center">
+        <FaExclamationCircle className="text-5xl text-red-500 mx-auto mb-4" />
+        <h2 className="text-2xl font-semibold text-red-700">{error}</h2>
+        <Link to="/" className="mt-4 inline-block bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700">
+          Go Back Home
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <Link to="/" className="flex items-center text-blue-600 hover:text-blue-800 mb-6">
+        <FaArrowLeft className="mr-2" /> Back to Restaurants
+      </Link>
+
+      {restaurant && (
+        <div className="mb-8 p-6 bg-white rounded-lg shadow-md">
+          <h1 className="text-4xl font-bold mb-2">{restaurant.name}</h1>
+          <p className="text-gray-600 mb-2">{restaurant.cuisine}</p>
+          <div className="flex items-center">
+            <FaStar className="text-yellow-500 mr-1" />
+            <span>{restaurant.rating.toFixed(1)}</span>
+            <span className="text-gray-500 ml-2">({restaurant.reviews} reviews)</span>
+          </div>
+          <p className="mt-4 text-gray-700">{restaurant.description}</p>
+        </div>
+      )}
+
+      <h2 className="text-3xl font-bold mb-6">Menu</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {menuItems.map((item) => (
+          <div key={item._id} className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col">
+            <div className="p-6 flex-grow">
+              <h3 className="text-xl font-semibold mb-2">{item.name}</h3>
+              <p className="text-gray-600 mb-4 flex-grow">{item.description}</p>
+              <p className="text-lg font-bold text-gray-800">${item.price.toFixed(2)}</p>
+            </div>
+            <div className="p-4 bg-gray-50 flex items-center justify-between">
+              <div className="flex items-center">
+                <label htmlFor={`quantity-${item._id}`} className="sr-only">Quantity</label>
+                <input
+                  type="number"
+                  id={`quantity-${item._id}`}
+                  name={`quantity-${item._id}`}
+                  min="1"
+                  value={quantities[item._id] || 1}
+                  onChange={(e) => handleQuantityChange(item._id, e.target.value)}
+                  className="w-16 p-2 border border-gray-300 rounded-md text-center"
+                />
+              </div>
+              <button
+                onClick={() => handleAddToCart(item)}
+                className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition flex items-center"
+              >
+                <FaShoppingCart className="mr-2" /> Add
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 };
 
 export default RestaurantMenu;

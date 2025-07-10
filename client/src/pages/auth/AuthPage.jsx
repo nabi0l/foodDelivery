@@ -1,14 +1,24 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const AuthPage = ({ initialMode = 'login' }) => {
   const [isLogin, setIsLogin] = useState(initialMode === 'login');
   const location = useLocation();
   const navigate = useNavigate();
 
+  // Form state
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     // Update the form mode when the URL changes
     setIsLogin(location.pathname === '/login' || location.pathname === '/auth');
+    setError('');
   }, [location.pathname]);
 
   const toggleAuthMode = (mode) => {
@@ -18,6 +28,41 @@ const AuthPage = ({ initialMode = 'login' }) => {
       navigate('/signup');
     }
     setIsLogin(mode === 'login');
+    setError('');
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      if (isLogin) {
+        // Login logic
+        const response = await axios.post('/api/user/login', { email, password });
+        localStorage.setItem('token', response.data.token);
+        const role = response.data.user?.role;
+        if (role === 'admin') {
+          navigate('/admin-dashboard');
+        } else if (role === 'restaurant_owner') {
+          navigate('/restaurant-dashboard');
+        } else {
+          navigate('/');
+        }
+      } else {
+        // Signup logic
+        if (password !== confirmPassword) {
+          setError('Passwords do not match');
+          setLoading(false);
+          return;
+        }
+        await axios.post('/api/user/register', { name, email, password });
+        navigate('/');
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || (isLogin ? 'Login failed' : 'Registration failed'));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -57,7 +102,7 @@ const AuthPage = ({ initialMode = 'login' }) => {
           </button>
         </div>
         
-        <form className="space-y-5">
+        <form className="space-y-5" onSubmit={handleSubmit}>
           {!isLogin && (
             <div className="space-y-1">
               <label className="text-sm font-medium text-gray-700">Full Name</label>
@@ -65,6 +110,9 @@ const AuthPage = ({ initialMode = 'login' }) => {
                 type="text"
                 placeholder="John Doe"
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-300 focus:border-transparent transition-all"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                required
               />
             </div>
           )}
@@ -75,6 +123,9 @@ const AuthPage = ({ initialMode = 'login' }) => {
               type="email"
               placeholder="you@example.com"
               className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-300 focus:border-transparent transition-all"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              required
             />
           </div>
           
@@ -91,6 +142,9 @@ const AuthPage = ({ initialMode = 'login' }) => {
               type="password"
               placeholder="••••••••"
               className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-300 focus:border-transparent transition-all"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              required
             />
           </div>
           
@@ -101,15 +155,21 @@ const AuthPage = ({ initialMode = 'login' }) => {
                 type="password"
                 placeholder="••••••••"
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-300 focus:border-transparent transition-all"
+                value={confirmPassword}
+                onChange={e => setConfirmPassword(e.target.value)}
+                required
               />
             </div>
           )}
           
+          {error && <p className="text-red-600 text-center">{error}</p>}
+          
           <button
             type="submit"
             className="w-full bg-red-600 text-white py-3 px-4 rounded-lg hover:bg-red-700 transition-all font-medium text-lg shadow-md hover:shadow-lg"
+            disabled={loading}
           >
-            {isLogin ? 'Sign In' : 'Create Account'}
+            {loading ? (isLogin ? 'Signing In...' : 'Creating Account...') : (isLogin ? 'Sign In' : 'Create Account')}
           </button>
         </form>
         
