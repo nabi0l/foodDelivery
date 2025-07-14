@@ -18,7 +18,7 @@ const RestaurantMenu = () => {
         setLoading(true);
         setError('');
 
-        const restaurantRes = await axios.get(`http://localhost:5000/api/restaurants/${restaurantId}`);
+        const restaurantRes = await axios.get(`http://localhost:5000/api/restaurant/${restaurantId}`);
         if (restaurantRes.data) {
           setRestaurant(restaurantRes.data);
         } else {

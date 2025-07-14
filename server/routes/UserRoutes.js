@@ -47,7 +47,20 @@ router.post('/login', async (req, res) => {
             'your_jwt_secret', // Replace with env variable in production
             { expiresIn: '1d' }
         );
-        res.json({ token, user: { id: user._id, name: user.name, email: user.email, role: user.role } });
+        let restaurantId = null;
+        if (user.role === 'restaurant_owner') {
+            restaurantId = user.restaurantId;
+        }
+        res.json({
+            token,
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                restaurantId // add this
+            }
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

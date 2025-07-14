@@ -3,6 +3,54 @@ const mongoose = require('mongoose');
 const router = express.Router();
 const PromoCode = require('../models/PromoCode');
 const Restaurant = require('../models/Restaurant');
+const { getRestaurantAnalytics } = require('../controllers/RestaurantController');
+
+// Add address-based restaurant search route
+router.get('/search/by-address', async (req, res) => {
+    try {
+        const { address, radius = 10 } = req.query;
+        
+        if (!address) {
+            return res.status(400).json({ message: 'Address is required' });
+        }
+
+        // For now, we'll do a simple text-based search
+        // In a real app, you'd use geocoding to get coordinates and search by distance
+        const restaurants = await Restaurant.find({
+            $or: [
+                { location: { $regex: address, $options: 'i' } },
+                { name: { $regex: address, $options: 'i' } },
+                { cuisine: { $regex: address, $options: 'i' } }
+            ],
+            isOpen: true
+        }).limit(20);
+
+        res.json(restaurants);
+    } catch (error) {
+        console.error('Error searching restaurants by address:', error);
+        res.status(500).json({ message: 'Error searching restaurants' });
+    }
+});
+
+// Get restaurants by location coordinates
+router.get('/search/by-location', async (req, res) => {
+    try {
+        const { lat, lng, radius = 10 } = req.query;
+        
+        if (!lat || !lng) {
+            return res.status(400).json({ message: 'Latitude and longitude are required' });
+        }
+
+        // For now, return all open restaurants
+        // In a real app, you'd implement geospatial queries
+        const restaurants = await Restaurant.find({ isOpen: true }).limit(20);
+        
+        res.json(restaurants);
+    } catch (error) {
+        console.error('Error searching restaurants by location:', error);
+        res.status(500).json({ message: 'Error searching restaurants' });
+    }
+});
 
 router.get('/', async (req, res) => {
     try {
@@ -139,5 +187,107 @@ router.delete('/code/:code', async (req, res) => {
     }
 });
 
+
+// create new restaurant logic
+router.post('/',async(req,res)=>{
+    try{
+        const newRestaurant = new Restaurant(req.body);
+        const savedRestaurant = await newRestaurant.save();
+        res.status(201).json(savedRestaurant);
+    } catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+
+//update the restaurant
+router.put('/:id', async (req, res) => {
+  try {
+    const updatedRestaurant = await Restaurant.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    );
+    if (!updatedRestaurant) {
+      return res.status(404).json({ message: 'Restaurant not found' });
+    }
+    res.json(updatedRestaurant);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+
+//delete the restaurant
+router.delete('/:id', async (req, res) => {
+  try {
+    const deletedRestaurant = await Restaurant.findByIdAndDelete(req.params.id);
+    if (!deletedRestaurant) {
+      return res.status(404).json({ message: 'Restaurant not found' });
+    }
+    res.json({ message: 'Restaurant deleted successfully' });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+// Get stats for a restaurant
+router.get('/:id/stats', async (req, res) => {
+  try {
+    const restaurantId = req.params.id;
+    // Total Orders
+    const Order = require('../models/Order');
+    const MenuItem = require('../models/MenuItem');
+
+    const totalOrders = await Order.countDocuments({ restaurantId });
+    // Total Revenue
+    const orders = await Order.find({ restaurantId });
+    const totalRevenue = orders.reduce((sum, order) => sum + (order.totalPrice || 0), 0);
+
+    // Top Item
+    const allItems = await Order.aggregate([
+      { $match: { restaurantId: mongoose.Types.ObjectId(restaurantId) } },
+      { $unwind: "$items" },
+      { $group: { _id: "$items.menuItemId", count: { $sum: "$items.quantity" } } },
+      { $sort: { count: -1 } },
+      { $limit: 1 }
+    ]);
+    let topItem = null;
+    if (allItems.length > 0) {
+      const menuItem = await MenuItem.findById(allItems[0]._id);
+      topItem = menuItem ? menuItem.name : null;
+    }
+
+    // Customer Rating (average)
+    const Restaurant = require('../models/Restaurant');
+    const restaurant = await Restaurant.findById(restaurantId);
+    const customerRating = restaurant?.rating || null;
+
+    res.json({
+      totalOrders,
+      totalRevenue,
+      topItem,
+      customerRating
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// General dashboard endpoint
+router.get('/dashboard', async (req, res) => {
+  try {
+    const Restaurant = require('../models/Restaurant');
+    const Order = require('../models/Order');
+    const User = require('../models/User');
+    const totalRestaurants = await Restaurant.countDocuments();
+    const totalOrders = await Order.countDocuments();
+    const totalUsers = await User.countDocuments();
+    res.json({ totalRestaurants, totalOrders, totalUsers });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+router.get('/:id/analytics', getRestaurantAnalytics);
 
 module.exports = router;

@@ -52,13 +52,17 @@ function App() {
           <Route path="/orders" element={<Orders />} />
           
           {/* Restaurant Dashboard Routes */}
-          <Route path="/restaurant-dashboard" element={<RestaurantDashboard />}>
+          <Route path="/restaurant-dashboard/:restaurantId" element={<RestaurantDashboard />}>
             <Route index element={<Navigate to="home" replace />} />
             <Route path="home" element={<RestaurantHome />} />
             <Route path="orders" element={<OrderManagement />} />
             <Route path="menu" element={<MenuManagement />} />
             <Route path="analytics" element={<RestaurantAnalytics />} />
             <Route path="reviews" element={<ReviewsManagement />} />
+          </Route>
+          {/* Fallback for /restaurant-dashboard/home for backward compatibility */}
+          <Route path="/restaurant-dashboard/home" element={<RestaurantDashboard />}>
+            <Route index element={<RestaurantHome />} />
           </Route>
 
           {/**Admin Dashboard Routes */}

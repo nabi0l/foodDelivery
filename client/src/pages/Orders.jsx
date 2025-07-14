@@ -125,98 +125,82 @@ const Orders = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {cart && cart.items && cart.items.length > 0 && (
-        <div className="bg-white shadow-lg rounded-lg p-6 mb-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Your Current Cart</h2>
-          <button 
-            onClick={() => navigate('/checkout')}
-            className="w-full bg-red-600 text-white py-3 rounded-md font-semibold hover:bg-red-700 transition-colors text-lg"
+    <div className="p-6">
+      <h2 className="text-2xl font-bold mb-4">Order Management</h2>
+      {/* Tabs */}
+      <div className="flex space-x-4 mb-6">
+        {statusTabs.map(tab => (
+          <button
+            key={tab.value}
+            className={`px-4 py-2 rounded ${selectedStatus === tab.value ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-700'}`}
+            onClick={() => setSelectedStatus(tab.value)}
           >
-            Proceed to Checkout (${(cart.totalPrice + 2.99).toFixed(2)})
+            {tab.label}
           </button>
-        </div>
-      )}
-      <h1 className="text-3xl font-bold text-gray-800 mb-8">My Orders</h1>
-      
-      {orderSuccess && (
-        <div className="mb-6 p-4 bg-green-100 text-green-800 rounded">
-          Order placed successfully! 🎉
-          {newOrderId && <div>Your order ID: {newOrderId}</div>}
-        </div>
-      )}
-      
-      {orders.length === 0 ? (
-        <div className="text-center py-12">
-          <div className="text-6xl text-gray-300 mb-4">
-            <FaUtensils className="mx-auto" />
-          </div>
-          <h2 className="text-2xl font-medium text-gray-700 mb-2">No orders yet</h2>
-          <p className="text-gray-500 mb-6">Your delicious food orders will appear here</p>
-          <Link 
-            to="/restaurants" 
-            className="inline-block bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition-colors"
-          >
-            Order Now
-          </Link>
-        </div>
+        ))}
+      </div>
+      {/* Table */}
+      {loading ? (
+        <div>Loading orders...</div>
       ) : (
-        <div className="space-y-6">
-          {orders.map((order) => (
-            <div key={order.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-              <div className="p-4 border-b border-gray-100 bg-gray-50">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                  <div className="mb-2 sm:mb-0">
-                    <h3 className="font-medium text-gray-900">Order #{order.id}</h3>
-                    <div className="text-sm text-gray-500">
-                      {order._id} • {_formatDate(order.createdAt)}
-                    </div>
-                  </div>
-                  <div className="flex items-center">
-                    {getStatusIcon(order.status)}
-                    <span className="font-medium">{order.status}</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="p-4 border-b border-gray-100">
-                <h4 className="font-medium text-gray-900 mb-2">{order.restaurant}</h4>
-                <ul className="space-y-2">
-                  {order.items?.map((item, itemIndex) => (
-                    <div key={itemIndex} className="flex justify-between py-1">
-                      <span>{item.quantity}x {item.name || 'Item'}</span>
-                      <span>${(item.price * item.quantity).toFixed(2)}</span>
-                    </div>
-                  ))}
-                </ul>
-              </div>
-              
-              <div className="p-4 bg-gray-50 flex flex-col sm:flex-row justify-between items-start sm:items-center">
-                <div className="mb-2 sm:mb-0">
-                  <p className="text-sm text-gray-600">
-                    <span className="font-medium">Delivery to:</span> {order.deliveryAddress}
-                  </p>
-                  <div className="text-sm text-gray-600">
-                    <div>Order Status: {order.deliveryStatus || 'Processing'}</div>
-                    <div>Payment Status: {order.paymentStatus || 'Pending'}</div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm text-gray-600">Total Amount</p>
-                  <div className="font-semibold">Total: ${order.totalPrice?.toFixed(2) || '0.00'}</div>
-                </div>
-              </div>
-              
-              <div className="p-3 bg-white border-t border-gray-100 flex justify-end space-x-3">
-                <button className="px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-md">
-                  Reorder
-                </button>
-                <button className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md">
-                  Track Order
-                </button>
-              </div>
-            </div>
-          ))}
+        <div className="overflow-x-auto rounded-lg shadow-md">
+          <table className="min-w-full bg-white border border-gray-200 rounded-lg">
+            <thead className="bg-red-100 sticky top-0 z-10">
+              <tr>
+                <th className="py-3 px-4 border-b text-left font-semibold text-gray-700">Order ID</th>
+                <th className="py-3 px-4 border-b text-left font-semibold text-gray-700">Customer</th>
+                <th className="py-3 px-4 border-b text-left font-semibold text-gray-700">Items</th>
+                <th className="py-3 px-4 border-b text-left font-semibold text-gray-700">Status</th>
+                <th className="py-3 px-4 border-b text-left font-semibold text-gray-700">Time</th>
+                <th className="py-3 px-4 border-b text-left font-semibold text-gray-700">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredOrders.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="text-center py-6 text-gray-500">No orders found.</td>
+                </tr>
+              ) : (
+                filteredOrders.map((order, idx) => (
+                  <tr
+                    key={order._id}
+                    className={
+                      idx % 2 === 0
+                        ? 'bg-white hover:bg-red-50 transition-colors'
+                        : 'bg-gray-50 hover:bg-red-50 transition-colors'
+                    }
+                  >
+                    <td className="py-3 px-4 border-b font-mono text-sm text-gray-700">#{order._id.slice(-5)}</td>
+                    <td className="py-3 px-4 border-b text-gray-800">{order.customerName || '-'}</td>
+                    <td className="py-3 px-4 border-b text-gray-700">
+                      {order.items && order.items.length > 0
+                        ? order.items.map(item => `${item.name} x${item.quantity}`).join(', ')
+                        : <span className="italic text-gray-400">No items</span>}
+                    </td>
+                    <td className="py-3 px-4 border-b capitalize">
+                      <span className={
+                        order.status === 'new'
+                          ? 'bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-semibold'
+                          : order.status === 'in_progress'
+                          ? 'bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full text-xs font-semibold'
+                          : order.status === 'completed'
+                          ? 'bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-semibold'
+                          : 'bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs font-semibold'
+                      }>
+                        {order.status}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 border-b text-gray-600">{timeAgo(order.createdAt)}</td>
+                    <td className="py-3 px-4 border-b">
+                      {order.status === 'new' && (
+                        <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-1 rounded transition-colors text-sm font-medium shadow-sm">Accept</button>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
       )}
     </div>

@@ -182,4 +182,16 @@ router.post('/checkout', async (req, res) => {
     }
 });
 
+//get all orders for specific restaurant
+
+router.get('/restaurant/:restaurantId/orders', async (req, res) => {
+  try {
+    const { restaurantId } = req.params;
+    const orders = await Order.find({ restaurant: restaurantId });
+    res.json(orders);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch orders' });
+  }
+});
+
 module.exports = router;

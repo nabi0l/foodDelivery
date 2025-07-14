@@ -1,14 +1,19 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import axios from 'axios';
-import { FiFilter, FiClock, FiStar, FiDollarSign, FiChevronDown, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiFilter, FiClock, FiStar, FiDollarSign, FiChevronDown, FiChevronLeft, FiChevronRight, FiMapPin } from 'react-icons/fi';
 import { FaStar, FaRegStar, FaStarHalfAlt } from 'react-icons/fa';
 import RestaurantCard from '../components/RestaurantCard';
 
 const RestaurantListing = () => {
+  const location = useLocation();
+  
   // State for data fetching
   const [restaurants, setRestaurants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchAddress, setSearchAddress] = useState('');
+  const [searchType, setSearchType] = useState('');
   
   // State for filters and pagination
   const [selectedCuisines, setSelectedCuisines] = useState([]);
@@ -30,23 +35,45 @@ const RestaurantListing = () => {
   useEffect(() => {
     const fetchRestaurants = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/restaurant/all');
-        // Transform the data to match the expected format
-        const formattedRestaurants = response.data.map(restaurant => ({
-          ...restaurant,
-          id: restaurant._id,
-          cuisine: restaurant.cuisine || 'Various',
-          rating: restaurant.rating || 0,
-          deliveryTime: restaurant.deliveryTime?.toString() || '20-30',
-          deliveryFee: 'Free',
-          minOrder: '$10',
-          image: restaurant.image || `https://source.unsplash.com/random/300x200?restaurant,${restaurant._id}`,
-          isOpen: restaurant.isOpen || false,
-          tags: restaurant.isPopular ? ['Popular'] : [],
-          priceRange: '$$',
-          reviewCount: Math.floor(Math.random() * 100) + 10
-        }));
-        setRestaurants(formattedRestaurants);
+        // Check if we have search results from navigation
+        if (location.state?.searchResults) {
+          const searchResults = location.state.searchResults;
+          const formattedRestaurants = searchResults.map(restaurant => ({
+            ...restaurant,
+            id: restaurant._id,
+            cuisine: restaurant.cuisine || 'Various',
+            rating: restaurant.rating || 0,
+            deliveryTime: restaurant.deliveryTime?.toString() || '20-30',
+            deliveryFee: 'Free',
+            minOrder: '$10',
+            image: restaurant.image || `https://source.unsplash.com/random/300x200?restaurant,${restaurant._id}`,
+            isOpen: restaurant.isOpen || false,
+            tags: restaurant.isPopular ? ['Popular'] : [],
+            priceRange: '$$',
+            reviewCount: Math.floor(Math.random() * 100) + 10
+          }));
+          setRestaurants(formattedRestaurants);
+          setSearchAddress(location.state.searchAddress || '');
+          setSearchType(location.state.searchType || '');
+        } else {
+          // Fetch all restaurants
+          const response = await axios.get('http://localhost:5000/api/restaurant/all');
+          const formattedRestaurants = response.data.map(restaurant => ({
+            ...restaurant,
+            id: restaurant._id,
+            cuisine: restaurant.cuisine || 'Various',
+            rating: restaurant.rating || 0,
+            deliveryTime: restaurant.deliveryTime?.toString() || '20-30',
+            deliveryFee: 'Free',
+            minOrder: '$10',
+            image: restaurant.image || `https://source.unsplash.com/random/300x200?restaurant,${restaurant._id}`,
+            isOpen: restaurant.isOpen || false,
+            tags: restaurant.isPopular ? ['Popular'] : [],
+            priceRange: '$$',
+            reviewCount: Math.floor(Math.random() * 100) + 10
+          }));
+          setRestaurants(formattedRestaurants);
+        }
       } catch (err) {
         console.error('Error fetching restaurants:', err);
         setError('Failed to load restaurants. Please try again later.');
@@ -56,7 +83,7 @@ const RestaurantListing = () => {
     };
 
     fetchRestaurants();
-  }, []);
+  }, [location.state]);
 
   // Fetch filter data from backend
   useEffect(() => {
@@ -226,9 +253,41 @@ const RestaurantListing = () => {
 
   return (
     <div className="container mx-auto px-4 py-6">
+      {/* Search Results Header */}
+      {searchAddress && (
+        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <FiMapPin className="text-blue-600 mr-2" />
+              <div>
+                <h2 className="text-lg font-semibold text-blue-900">
+                  Restaurants near "{searchAddress}"
+                </h2>
+                <p className="text-sm text-blue-700">
+                  Found {restaurants.length} restaurants in your area
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => {
+                setSearchAddress('');
+                setSearchType('');
+                // Reload all restaurants
+                window.location.reload();
+              }}
+              className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+            >
+              Clear search
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Header and Filters */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-        <h1 className="text-2xl font-bold mb-4 md:mb-0">Restaurants</h1>
+        <h1 className="text-2xl font-bold mb-4 md:mb-0">
+          {searchAddress ? 'Search Results' : 'Restaurants'}
+        </h1>
         
         <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
           {/* Mobile filter button */}

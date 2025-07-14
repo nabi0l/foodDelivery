@@ -14,7 +14,15 @@ const Login = () => {
     try {
       const response = await axios.post('/api/user/login', { email, password });
       localStorage.setItem('token', response.data.token);
-      navigate('/'); // Redirect to home page
+      const role = response.data.user?.role;
+      const restaurantId = response.data.user?.restaurantId;
+      if (role === 'admin') {
+        navigate('/admin-dashboard');
+      } else if (role === 'restaurant_owner') {
+        navigate('/restaurant-dashboard/home');
+      } else {
+        navigate('/');
+      }
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
     }

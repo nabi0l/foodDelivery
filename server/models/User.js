@@ -13,6 +13,11 @@ const userSchema = new Schema({
     password: String,
     role: { type: String, enum: ['user', 'restaurant_owner', 'admin'], default: 'user' },
     address: String,
+    restaurantId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Restaurant',
+        default: null
+    },
     createdAt: Date,
     updatedAt: Date
 }, {

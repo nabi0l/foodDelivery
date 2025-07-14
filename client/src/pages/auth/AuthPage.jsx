@@ -40,11 +40,22 @@ const AuthPage = ({ initialMode = 'login' }) => {
         // Login logic
         const response = await axios.post('/api/user/login', { email, password });
         localStorage.setItem('token', response.data.token);
+        if (response.data.user?.restaurantId) {
+          localStorage.setItem('restaurantId', response.data.user.restaurantId);
+        }
         const role = response.data.user?.role;
+        if (role) {
+          localStorage.setItem('role', role);
+        }
         if (role === 'admin') {
           navigate('/admin-dashboard');
         } else if (role === 'restaurant_owner') {
-          navigate('/restaurant-dashboard');
+          const restaurantId = response.data.user?.restaurantId;
+          if (restaurantId) {
+            navigate(`/restaurant-dashboard/${restaurantId}`);
+          } else {
+            navigate('/restaurant-dashboard/home');
+          }
         } else {
           navigate('/');
         }

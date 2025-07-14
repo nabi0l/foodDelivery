@@ -50,7 +50,7 @@ const restaurants = [
       rating: 4.9,
       deliveryTime: 60,
       menuItems: [],
-      image: 'https://media.istockphoto.com/id/1266656208/photo/cut-a-large-piece-of-smoked-beef-brisket-to-the-ribs-with-a-dark-crust-classic-texas-barbecue.webp',
+      image: 'https://www.shutterstock.com/shutterstock/photos/2344596997/display_1500/stock-vector-barbeque-smokehouse-bbq-barbecue-bar-and-grill-logo-design-with-fork-and-fire-2344596997.jpg',
       isOpen: true,
       isPopular: true,
       location: '987 Grill Road, Austin, USA',
