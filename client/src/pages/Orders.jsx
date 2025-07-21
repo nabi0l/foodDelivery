@@ -1,49 +1,34 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Link } from 'react-router-dom';
-import { FaUtensils, FaMotorcycle, FaCheckCircle, FaSpinner, FaExclamationCircle } from 'react-icons/fa';
 import axios from 'axios';
+import { FaCheckCircle, FaClock, FaTimesCircle, FaBoxOpen } from 'react-icons/fa';
+
+const statusStyles = {
+  new: 'bg-blue-100 text-blue-700',
+  in_progress: 'bg-yellow-100 text-yellow-700',
+  completed: 'bg-green-100 text-green-700',
+  cancelled: 'bg-red-100 text-red-700',
+};
+
+const statusLabels = {
+  new: 'New',
+  in_progress: 'In Progress',
+  completed: 'Completed',
+  cancelled: 'Cancelled',
+};
+
+const statusIcons = {
+  new: <FaBoxOpen className="text-blue-400 text-xl mr-2" />,
+  in_progress: <FaClock className="text-yellow-400 text-xl mr-2" />,
+  completed: <FaCheckCircle className="text-green-500 text-xl mr-2" />,
+  cancelled: <FaTimesCircle className="text-red-400 text-xl mr-2" />,
+};
 
 const Orders = () => {
-  const [cart, setCart] = useState(null);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    deliveryAddress: '',
-    specialInstructions: '',
-    paymentMethod: 'cash_on_delivery'
-  });
-  const location = useLocation();
-  const orderSuccess = location.state?.orderSuccess;
-  const newOrderId = location.state?.newOrderId;
 
   useEffect(() => {
-    const fetchCart = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const userId = localStorage.getItem('userId');
-        if (userId) {
-          const response = await axios.get(`http://localhost:5000/api/cart/user/${userId}`, {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            }
-          });
-          if (response.data.success) {
-            setCart(response.data.data);
-          }
-        }
-      } catch (err) {
-        if (err.response && err.response.status === 404) {
-          setCart(null);
-        } else {
-          console.error('Error fetching cart in Orders page:', err);
-        }
-      }
-    };
-    fetchCart();
     const fetchOrders = async () => {
       try {
         setLoading(true);
@@ -61,15 +46,9 @@ const Orders = () => {
             'Content-Type': 'application/json'
           }
         });
-        if (Array.isArray(response.data)) {
-          setOrders(response.data);
-        } else {
-          setOrders([]);
-        }
+        setOrders(Array.isArray(response.data) ? response.data : []);
       } catch (err) {
-        console.error('Error fetching orders:', err);
-        const errorMessage = err.response?.data?.message || err.message || 'Failed to load orders. Please try again later.';
-        setError(errorMessage);
+        setError('Failed to load orders.');
       } finally {
         setLoading(false);
       }
@@ -78,131 +57,76 @@ const Orders = () => {
     fetchOrders();
   }, []);
 
-  const _formatDate = (dateString) => {
-    const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-    return new Date(dateString).toLocaleDateString(undefined, options);
-  };
+  if (loading) return (
+    <div className="flex items-center justify-center min-h-[40vh]">
+      <FaClock className="animate-spin text-3xl text-red-500 mr-2" />
+      <span className="text-lg text-gray-600">Loading your orders...</span>
+    </div>
+  );
+  if (error) return (
+    <div className="flex flex-col items-center justify-center min-h-[40vh]">
+      <FaTimesCircle className="text-4xl text-red-500 mb-2" />
+      <span className="text-lg text-gray-600">{error}</span>
+    </div>
+  );
 
-  const getStatusIcon = (status) => {
-    const statusLower = (status || '').toLowerCase();
-    switch (statusLower) {
-      case 'delivered':
-        return <FaCheckCircle className="text-green-500 mr-2" />;
-      case 'preparing':
-        return <FaUtensils className="text-yellow-500 mr-2" />;
-      case 'on the way':
-      case 'out for delivery':
-        return <FaMotorcycle className="text-blue-500 mr-2" />;
-      default:
-        return <FaUtensils className="text-gray-500 mr-2" />;
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <FaSpinner className="animate-spin text-4xl text-blue-500" />
-        <span className="ml-2 text-lg">Loading your orders...</span>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <FaExclamationCircle className="text-red-500 text-5xl mx-auto mb-4" />
-          <p className="text-xl text-gray-700">{error}</p>
-          <button 
-            onClick={() => window.location.reload()} 
-            className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
-          >
-            Try Again
-          </button>
-        </div>
-      </div>
-    );
-  }
+  // Only show orders with status 'paid' or 'completed'
+  const paidOrders = orders.filter(order => order.status === 'paid' || order.status === 'completed');
 
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Order Management</h2>
-      {/* Tabs */}
-      <div className="flex space-x-4 mb-6">
-        {statusTabs.map(tab => (
-          <button
-            key={tab.value}
-            className={`px-4 py-2 rounded ${selectedStatus === tab.value ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-700'}`}
-            onClick={() => setSelectedStatus(tab.value)}
-          >
-            {tab.label}
-          </button>
-        ))}
+    <div className="min-h-screen bg-gray-50 py-10 px-4">
+      <div className="max-w-4xl mx-auto">
+        <h2 className="text-3xl font-bold text-red-700 mb-8 text-center">My Orders</h2>
+        {paidOrders.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 bg-white rounded-xl shadow-md">
+            <FaBoxOpen className="text-5xl text-gray-300 mb-4" />
+            <h3 className="text-xl font-semibold text-gray-700 mb-2">No orders yet</h3>
+            <p className="text-gray-500 mb-4">You haven't placed any orders yet. Start exploring delicious food now!</p>
+            <a href="/" className="px-6 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition">Order Now</a>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {paidOrders.map(order => (
+              <div key={order._id} className="bg-white rounded-xl shadow-md p-6 flex flex-col gap-2 border border-gray-100 hover:shadow-lg transition">
+                <div className="flex items-center mb-2">
+                  {statusIcons[order.status] || <FaBoxOpen className="text-gray-400 text-xl mr-2" />}
+                  <span className={`px-3 py-1 rounded-full text-xs font-semibold ml-2 ${statusStyles[order.status] || 'bg-gray-100 text-gray-700'}`}>
+                    {statusLabels[order.status] || order.status}
+                  </span>
+                  <span className="ml-auto text-xs text-gray-400">{new Date(order.createdAt).toLocaleString()}</span>
+                </div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="font-mono text-sm text-gray-500">Order #{order._id.slice(-5)}</span>
+                </div>
+                <div className="mb-2">
+                  <span className="block text-gray-700 font-semibold mb-1">Items:</span>
+                  <ul className="list-disc list-inside text-gray-600 text-sm">
+                    {order.items && order.items.length > 0 ? (
+                      order.items.map((item, idx) => (
+                        <li key={idx}>{item.name} <span className="text-gray-400">x{item.quantity}</span></li>
+                      ))
+                    ) : (
+                      <li className="italic text-gray-400">No items</li>
+                    )}
+                  </ul>
+                </div>
+                {order.deliveryAddress && (
+                  <div className="mb-1">
+                    <span className="block text-gray-700 font-semibold">Delivery Address:</span>
+                    <span className="text-gray-600 text-sm">{order.deliveryAddress}</span>
+                  </div>
+                )}
+                {order.specialInstructions && (
+                  <div className="mb-1">
+                    <span className="block text-gray-700 font-semibold">Instructions:</span>
+                    <span className="text-gray-600 text-sm">{order.specialInstructions}</span>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
-      {/* Table */}
-      {loading ? (
-        <div>Loading orders...</div>
-      ) : (
-        <div className="overflow-x-auto rounded-lg shadow-md">
-          <table className="min-w-full bg-white border border-gray-200 rounded-lg">
-            <thead className="bg-red-100 sticky top-0 z-10">
-              <tr>
-                <th className="py-3 px-4 border-b text-left font-semibold text-gray-700">Order ID</th>
-                <th className="py-3 px-4 border-b text-left font-semibold text-gray-700">Customer</th>
-                <th className="py-3 px-4 border-b text-left font-semibold text-gray-700">Items</th>
-                <th className="py-3 px-4 border-b text-left font-semibold text-gray-700">Status</th>
-                <th className="py-3 px-4 border-b text-left font-semibold text-gray-700">Time</th>
-                <th className="py-3 px-4 border-b text-left font-semibold text-gray-700">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredOrders.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="text-center py-6 text-gray-500">No orders found.</td>
-                </tr>
-              ) : (
-                filteredOrders.map((order, idx) => (
-                  <tr
-                    key={order._id}
-                    className={
-                      idx % 2 === 0
-                        ? 'bg-white hover:bg-red-50 transition-colors'
-                        : 'bg-gray-50 hover:bg-red-50 transition-colors'
-                    }
-                  >
-                    <td className="py-3 px-4 border-b font-mono text-sm text-gray-700">#{order._id.slice(-5)}</td>
-                    <td className="py-3 px-4 border-b text-gray-800">{order.customerName || '-'}</td>
-                    <td className="py-3 px-4 border-b text-gray-700">
-                      {order.items && order.items.length > 0
-                        ? order.items.map(item => `${item.name} x${item.quantity}`).join(', ')
-                        : <span className="italic text-gray-400">No items</span>}
-                    </td>
-                    <td className="py-3 px-4 border-b capitalize">
-                      <span className={
-                        order.status === 'new'
-                          ? 'bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-semibold'
-                          : order.status === 'in_progress'
-                          ? 'bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full text-xs font-semibold'
-                          : order.status === 'completed'
-                          ? 'bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-semibold'
-                          : 'bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs font-semibold'
-                      }>
-                        {order.status}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 border-b text-gray-600">{timeAgo(order.createdAt)}</td>
-                    <td className="py-3 px-4 border-b">
-                      {order.status === 'new' && (
-                        <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-1 rounded transition-colors text-sm font-medium shadow-sm">Accept</button>
-                      )}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      )}
     </div>
   );
 };

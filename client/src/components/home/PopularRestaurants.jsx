@@ -1,12 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaStar, FaMotorcycle } from 'react-icons/fa';
 import axios from 'axios';
+import { useCart } from '../../context/CartContext';
 
 const PopularRestaurants = () => {
   const [restaurants, setRestaurants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { addToCart } = useCart();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPopularRestaurants = async () => {
@@ -48,6 +51,12 @@ const PopularRestaurants = () => {
       </section>
     );
   }
+
+  const handleOrderNow = (restaurant) => {
+    // Optionally, add a default item or just the restaurant
+    addToCart({ restaurantId: restaurant._id });
+    navigate('/checkout'); // or '/cart'
+  };
 
   return (
     <section className="py-16 px-4 bg-gray-50">
@@ -93,12 +102,12 @@ const PopularRestaurants = () => {
                     <FaMotorcycle className="mr-1" />
                     {restaurant.deliveryTime ? `${restaurant.deliveryTime} min` : 'Varies'}
                   </div>
-                  <Link
-                    to={`/restaurants/${restaurant.id}`}
+                  <button
+                    onClick={() => handleOrderNow(restaurant)}
                     className="text-red-800 hover:underline font-medium"
                   >
                     Order Now
-                  </Link>
+                  </button>
                 </div>
               </div>
             </div>

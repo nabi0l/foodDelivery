@@ -31,8 +31,9 @@ const users = [
     name: 'Restaurant Owner',
     email: 'ebbabi98@gmail.com',
     password: 'pasw1234',
-    address: 'Restaurant Address',
+    address: 'Addis Ababa, Ethiopia',
     role: 'restaurant_owner',
+    country:'Ethiopia',
   },
 ];
 

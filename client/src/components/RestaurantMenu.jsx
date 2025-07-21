@@ -37,14 +37,15 @@ const RestaurantMenu = () => {
   const [showCart, setShowCart] = useState(false);
 
   useEffect(() => {
+    if (!id) {
+      setError('No restaurant selected.');
+      setLoading(false);
+      return;
+    }
     const fetchRestaurantAndMenu = async () => {
       try {
         setLoading(true);
         setError(null);
-        
-        if (!id) {
-          throw new Error('No restaurant ID provided');
-        }
         
         // First, try to get the restaurant details
         const restaurantRes = await axios.get(`http://localhost:5000/api/restaurant/${id}`);
@@ -130,9 +131,7 @@ const RestaurantMenu = () => {
       }
     };
 
-    if (id) {
-      fetchRestaurantAndMenu();
-    }
+    fetchRestaurantAndMenu();
   }, [id]);
   const [quantities, setQuantities] = useState({});
   const [customizations, setCustomizations] = useState({});
@@ -653,6 +652,7 @@ const RestaurantMenu = () => {
                 </div>
                 <button
                   className="w-full bg-red-600 text-white py-3 rounded-lg font-medium hover:bg-red-700 transition-colors"
+                  onClick={() => _navigate('/cart')}
                 >
                   Proceed to Checkout
                 </button>

@@ -58,6 +58,7 @@ const orderSchema = new Schema({
     },
     specialInstructions: {
         type: String,
+        
         default: ''
     }
 }, {

@@ -45,7 +45,8 @@ router.post('/', async (req, res) => {
         items: req.body.items,
         totalPrice: req.body.totalPrice,
         paymentStatus: req.body.paymentStatus,
-        deliveryStatus: req.body.deliveryStatus
+        deliveryStatus: req.body.deliveryStatus,
+        status: 'pending_payment' // Ensure status is set
     });
     try {
         const newOrder = await order.save();
@@ -151,7 +152,8 @@ router.post('/checkout', async (req, res) => {
             paymentStatus: 'pending',
             deliveryStatus: 'pending',
             deliveryAddress: deliveryAddress || 'Not specified',
-            paymentMethod: paymentMethod || 'cash_on_delivery'
+            paymentMethod: paymentMethod || 'cash_on_delivery',
+            status: 'pending_payment' // Ensure status is set
         });
 
         // 3. Save the order
@@ -179,6 +181,21 @@ router.post('/checkout', async (req, res) => {
         });
     } finally {
         session.endSession();
+    }
+});
+
+// PATCH endpoint to update order status
+router.patch('/update-status/:orderId', async (req, res) => {
+    const { orderId } = req.params;
+    const { status } = req.body;
+    try {
+        const order = await Order.findById(orderId);
+        if (!order) return res.status(404).json({ message: 'Order not found' });
+        order.status = status;
+        await order.save();
+        res.json({ success: true, order });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
     }
 });
 

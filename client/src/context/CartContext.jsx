@@ -1,11 +1,20 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 
 const CartContext = createContext();
 
 export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
-  const [cart, setCart] = useState([]);
+  // Initialize cart from localStorage if available
+  const [cart, setCart] = useState(() => {
+    const savedCart = localStorage.getItem('cart');
+    return savedCart ? JSON.parse(savedCart) : [];
+  });
+
+  // Save cart to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('cart', JSON.stringify(cart));
+  }, [cart]);
 
   const addToCart = (item) => {
     setCart(prevCart => {
@@ -36,11 +45,18 @@ export const CartProvider = ({ children }) => {
     );
   };
 
+  // Only clear cart after successful payment
+  const clearCart = () => {
+    setCart([]);
+    localStorage.removeItem('cart');
+  };
+
   const value = {
     cart,
     addToCart,
     removeFromCart,
-    updateCartItemQuantity
+    updateCartItemQuantity,
+    clearCart // Export the clearCart function
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

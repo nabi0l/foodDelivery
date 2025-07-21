@@ -85,6 +85,25 @@ router.get('/popular', async (req, res) => {
     }
 });
 
+// Get all restaurants or filter by country
+router.get('/', async (req, res) => {
+    try {
+        const { country } = req.query;
+        const query = {};
+        
+        if (country) {
+            query.country = { $regex: new RegExp(country, 'i') };
+        }
+        
+        const restaurants = await Restaurant.find(query);
+        res.json(restaurants);
+    } catch (error) {
+        console.error('Error fetching restaurants:', error);
+        res.status(500).json({ message: 'Error fetching restaurants' });
+    }
+});
+
+// Keep the /all route for backward compatibility
 router.get('/all', async (req, res) => {
     try {
         const restaurants = await Restaurant.find();

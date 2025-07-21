@@ -12,8 +12,10 @@ import {
   FaArrowLeft
 } from 'react-icons/fa';
 import { toast } from 'react-toastify';
+import { useCart } from '../context/CartContext'; // Add this import
 
-const Checkout = ({ cart, onOrderPlaced, onCancel }) => {
+const Checkout = ({ cart: cartProp, onOrderPlaced, onCancel }) => {
+  const { clearCart } = useCart(); // Get clearCart from context
   const [formData, setFormData] = useState({
     deliveryAddress: '',
     specialInstructions: '',
@@ -27,7 +29,7 @@ const Checkout = ({ cart, onOrderPlaced, onCancel }) => {
 
   // Calculate delivery fee
   const deliveryFee = 2.99;
-  const total = cart ? (cart.totalPrice + deliveryFee).toFixed(2) : '0.00';
+  const total = cartProp ? (cartProp.totalPrice + deliveryFee).toFixed(2) : '0.00';
   
   const { deliveryAddress, specialInstructions, paymentMethod } = formData;
   
@@ -66,7 +68,7 @@ const Checkout = ({ cart, onOrderPlaced, onCancel }) => {
       return;
     }
 
-    if (!cart?.items?.length) {
+    if (!cartProp?.items?.length) {
       setError('Your cart is empty');
       return;
     }
@@ -88,14 +90,14 @@ const Checkout = ({ cart, onOrderPlaced, onCancel }) => {
       // Prepare order data
       const orderData = {
         userId,
-        restaurantId: cart.restaurant?._id || cart.restaurant,
-        items: cart.items.map(item => ({
+        restaurantId: cartProp.restaurant?._id || cartProp.restaurant,
+        items: cartProp.items.map(item => ({
           menuItemId: item.menuItemId || item._id,
           name: item.name,
           quantity: item.quantity,
           price: item.price
         })),
-        totalPrice: cart.totalPrice,
+        totalPrice: cartProp.totalPrice,
         deliveryAddress: deliveryAddress.trim(),
         paymentMethod,
         specialInstructions: specialInstructions.trim()
@@ -116,6 +118,10 @@ const Checkout = ({ cart, onOrderPlaced, onCancel }) => {
       if (response.data.success) {
         setOrderDetails(response.data.order);
         setOrderPlaced(true);
+        
+        // Only clear cart after successful payment and order placement
+        clearCart();
+        
         toast.success('Order placed successfully!');
         setTimeout(() => {
           if (onOrderPlaced) onOrderPlaced(response.data.order);
@@ -137,7 +143,7 @@ const Checkout = ({ cart, onOrderPlaced, onCancel }) => {
 
   if (orderPlaced && orderDetails) {
     return (
-      <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
+      <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md mt-8">
         <div className="text-center p-8">
           <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <FaCheckCircle className="text-green-500 text-4xl" />
@@ -184,111 +190,113 @@ const Checkout = ({ cart, onOrderPlaced, onCancel }) => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
-      <div className="flex items-center mb-6">
-        <button 
-          onClick={onCancel}
-          className="mr-4 text-gray-600 hover:text-gray-800"
-          disabled={isLoading}
-        >
-          <FaArrowLeft className="text-xl" />
-        </button>
-        <h2 className="text-2xl font-bold text-gray-800">Checkout</h2>
+    <div className="min-h-screen bg-gray-50 py-10 px-2">
+      <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
+        <div className="flex items-center mb-6">
+          <button 
+            onClick={onCancel}
+            className="mr-4 text-gray-600 hover:text-gray-800"
+            disabled={isLoading}
+          >
+            <FaArrowLeft className="text-xl" />
+          </button>
+          <h2 className="text-2xl font-bold text-gray-800">Checkout</h2>
+        </div>
+        
+        {error && (
+          <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 flex items-start">
+            <FaExclamationTriangle className="text-xl mr-2 mt-1" />
+            <span>{error}</span>
+          </div>
+        )}
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label className="block text-gray-700 font-medium mb-2">
+              <FaMapMarkerAlt className="inline mr-2" /> Delivery Address
+            </label>
+            <input
+              type="text"
+              name="deliveryAddress"
+              value={deliveryAddress}
+              onChange={handleInputChange}
+              className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
+              placeholder="Enter your delivery address"
+              disabled={isLoading}
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700 font-medium mb-2">
+              Special Instructions (optional)
+            </label>
+            <textarea
+              name="specialInstructions"
+              value={specialInstructions}
+              onChange={handleInputChange}
+              className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
+              placeholder="e.g. Leave at the door, call on arrival, etc."
+              disabled={isLoading}
+            />
+          </div>
+          <div className="mb-6">
+            <label className="block text-gray-700 font-medium mb-2">Payment Method</label>
+            <div className="flex items-center gap-6">
+              <label className="flex items-center cursor-pointer">
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value="cash_on_delivery"
+                  checked={paymentMethod === 'cash_on_delivery'}
+                  onChange={() => handleRadioChange('cash_on_delivery')}
+                  className="mr-2"
+                  disabled={isLoading}
+                />
+                <FaMoneyBillWave className="text-green-500 mr-1" /> Cash on Delivery
+              </label>
+              <label className="flex items-center cursor-pointer">
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value="card"
+                  checked={paymentMethod === 'card'}
+                  onChange={() => handleRadioChange('card')}
+                  className="mr-2"
+                  disabled={isLoading}
+                />
+                <FaCreditCard className="text-blue-500 mr-1" /> Credit/Debit Card
+              </label>
+            </div>
+          </div>
+          <div className="mb-6">
+            <div className="flex justify-between items-center text-lg font-semibold">
+              <span>Subtotal:</span>
+              <span>${cartProp?.totalPrice?.toFixed(2) || '0.00'}</span>
+            </div>
+            <div className="flex justify-between items-center text-lg">
+              <span>Delivery Fee:</span>
+              <span>${deliveryFee.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between items-center text-xl font-bold mt-2">
+              <span>Total:</span>
+              <span>${total}</span>
+            </div>
+          </div>
+          <button
+            type="submit"
+            className={`w-full py-3 rounded-md font-semibold text-lg transition-colors ${isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-600 text-white hover:bg-red-700'}`}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <span className="flex items-center justify-center">
+                <FaSpinner className="animate-spin mr-2" /> Placing Order...
+              </span>
+            ) : (
+              <span className="flex items-center justify-center">
+                <FaShoppingCart className="mr-2" /> Place Order (${total})
+              </span>
+            )}
+          </button>
+        </form>
       </div>
-      
-      {error && (
-        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 flex items-start">
-          <FaExclamationTriangle className="text-xl mr-2 mt-1" />
-          <span>{error}</span>
-        </div>
-      )}
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block text-gray-700 font-medium mb-2">
-            <FaMapMarkerAlt className="inline mr-2" /> Delivery Address
-          </label>
-          <input
-            type="text"
-            name="deliveryAddress"
-            value={deliveryAddress}
-            onChange={handleInputChange}
-            className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
-            placeholder="Enter your delivery address"
-            disabled={isLoading}
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-gray-700 font-medium mb-2">
-            Special Instructions (optional)
-          </label>
-          <textarea
-            name="specialInstructions"
-            value={specialInstructions}
-            onChange={handleInputChange}
-            className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
-            placeholder="e.g. Leave at the door, call on arrival, etc."
-            disabled={isLoading}
-          />
-        </div>
-        <div className="mb-6">
-          <label className="block text-gray-700 font-medium mb-2">Payment Method</label>
-          <div className="flex items-center gap-6">
-            <label className="flex items-center cursor-pointer">
-              <input
-                type="radio"
-                name="paymentMethod"
-                value="cash_on_delivery"
-                checked={paymentMethod === 'cash_on_delivery'}
-                onChange={() => handleRadioChange('cash_on_delivery')}
-                className="mr-2"
-                disabled={isLoading}
-              />
-              <FaMoneyBillWave className="text-green-500 mr-1" /> Cash on Delivery
-            </label>
-            <label className="flex items-center cursor-pointer">
-              <input
-                type="radio"
-                name="paymentMethod"
-                value="card"
-                checked={paymentMethod === 'card'}
-                onChange={() => handleRadioChange('card')}
-                className="mr-2"
-                disabled={isLoading}
-              />
-              <FaCreditCard className="text-blue-500 mr-1" /> Credit/Debit Card
-            </label>
-          </div>
-        </div>
-        <div className="mb-6">
-          <div className="flex justify-between items-center text-lg font-semibold">
-            <span>Subtotal:</span>
-            <span>${cart?.totalPrice?.toFixed(2) || '0.00'}</span>
-          </div>
-          <div className="flex justify-between items-center text-lg">
-            <span>Delivery Fee:</span>
-            <span>${deliveryFee.toFixed(2)}</span>
-          </div>
-          <div className="flex justify-between items-center text-xl font-bold mt-2">
-            <span>Total:</span>
-            <span>${total}</span>
-          </div>
-        </div>
-        <button
-          type="submit"
-          className={`w-full py-3 rounded-md font-semibold text-lg transition-colors ${isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-600 text-white hover:bg-red-700'}`}
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <span className="flex items-center justify-center">
-              <FaSpinner className="animate-spin mr-2" /> Placing Order...
-            </span>
-          ) : (
-            <span className="flex items-center justify-center">
-              <FaShoppingCart className="mr-2" /> Place Order (${total})
-            </span>
-          )}
-        </button>
-      </form>
     </div>
   );
 };

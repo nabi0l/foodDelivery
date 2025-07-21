@@ -37,8 +37,18 @@ const menuItems = [
         name: 'Customization',
         isMultiSelect: true,
         options: [
+          { name: 'Extra Patty', price: 2.50 },
           { name: 'Add Cheese', price: 1.00 },
-          { name: 'Add Bacon', price: 1.50 }
+          { name: 'Add Bacon', price: 1.50 },
+          { name: 'Extra Sauce', price: 0.50 }
+        ]
+      },
+      {
+        name: 'Doneness',
+        isMultiSelect: false,
+        options: [
+          { name: 'Medium', price: 0 },
+          { name: 'Well Done', price: 0 }
         ]
       }
     ]
@@ -60,7 +70,16 @@ const menuItems = [
         options: [
           { name: 'BBQ', price: 0 },
           { name: 'Ranch', price: 0 },
-          { name: 'Honey Mustard', price: 0 }
+          { name: 'Honey Mustard', price: 0 },
+          { name: 'Buffalo', price: 0 }
+        ]
+      },
+      {
+        name: 'Portion Size',
+        isMultiSelect: false,
+        options: [
+          { name: 'Regular', price: 0 },
+          { name: 'Large', price: 2.00 }
         ]
       }
     ]
@@ -74,7 +93,18 @@ const menuItems = [
     category: 'Burgers',
     tags: ['bacon', 'double', 'signature'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Customization',
+        isMultiSelect: true,
+        options: [
+          { name: 'Extra Bacon', price: 1.50 },
+          { name: 'Extra Cheese', price: 1.00 },
+          { name: 'Add Jalapeños', price: 0.75 }
+        ]
+      }
+    ]
   },
 
   // Smokehouse BBQ
@@ -90,12 +120,22 @@ const menuItems = [
     deliveryOptions: ['paid', 'fast'],
     options: [
       {
+        name: 'Sauce Choice',
+        isMultiSelect: false,
+        options: [
+          { name: 'Original BBQ', price: 0 },
+          { name: 'Spicy BBQ', price: 0 },
+          { name: 'Honey BBQ', price: 0 }
+        ]
+      },
+      {
         name: 'Sides',
         isMultiSelect: true,
         options: [
-          { name: 'Coleslaw', price: 0.50 },
+          { name: 'Coleslaw', price: 0 },
           { name: 'Baked Beans', price: 0 },
-          { name: 'Mac & Cheese', price: 1.50 }
+          { name: 'Mac & Cheese', price: 1.50 },
+          { name: 'Cornbread', price: 1.00 }
         ]
       }
     ]
@@ -109,7 +149,27 @@ const menuItems = [
     category: 'Sandwiches',
     tags: ['pork', 'sandwich'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Bun Choice',
+        isMultiSelect: false,
+        options: [
+          { name: 'Brioche', price: 0 },
+          { name: 'Whole Wheat', price: 0 },
+          { name: 'Gluten-Free', price: 1.50 }
+        ]
+      },
+      {
+        name: 'Add-ons',
+        isMultiSelect: true,
+        options: [
+          { name: 'Extra Pork', price: 2.50 },
+          { name: 'Cheese', price: 1.00 },
+          { name: 'Pickles', price: 0.50 }
+        ]
+      }
+    ]
   },
   {
     name: 'Brisket Plate',
@@ -121,7 +181,26 @@ const menuItems = [
     tags: ['beef', 'smoked', 'signature'],
     isAvailable: true,
     deliveryOptions: ['paid', 'fast'],
-    popularFilters: ['promo', 'new']
+    options: [
+      {
+        name: 'Cut Preference',
+        isMultiSelect: false,
+        options: [
+          { name: 'Lean', price: 0 },
+          { name: 'Mixed', price: 0 },
+          { name: 'Fatty', price: 0 }
+        ]
+      },
+      {
+        name: 'Sides',
+        isMultiSelect: true,
+        options: [
+          { name: 'Potato Salad', price: 0 },
+          { name: 'Green Beans', price: 0 },
+          { name: 'Corn on the Cob', price: 1.00 }
+        ]
+      }
+    ]
   },
 
   // Ocean Grill
@@ -140,9 +219,18 @@ const menuItems = [
         name: 'Preparation',
         isMultiSelect: false,
         options: [
-          { name: 'Medium Rare', price: 1.00 },
-          { name: 'Medium', price: 1.50 },
-          { name: 'Well Done', price: 2.50 }
+          { name: 'Medium Rare', price: 0 },
+          { name: 'Medium', price: 0 },
+          { name: 'Well Done', price: 0 }
+        ]
+      },
+      {
+        name: 'Sauce',
+        isMultiSelect: false,
+        options: [
+          { name: 'Lemon Butter', price: 1.00 },
+          { name: 'Dill Cream', price: 1.50 },
+          { name: 'Mango Salsa', price: 2.00 }
         ]
       }
     ]
@@ -156,7 +244,26 @@ const menuItems = [
     category: 'Seafood',
     tags: ['lobster', 'premium'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Style',
+        isMultiSelect: false,
+        options: [
+          { name: 'Maine Style (Cold)', price: 0 },
+          { name: 'Connecticut Style (Warm with Butter)', price: 0 }
+        ]
+      },
+      {
+        name: 'Add-ons',
+        isMultiSelect: true,
+        options: [
+          { name: 'Extra Lobster', price: 5.00 },
+          { name: 'Avocado', price: 1.50 },
+          { name: 'Bacon', price: 1.50 }
+        ]
+      }
+    ]
   },
   {
     name: 'Clam Chowder',
@@ -167,7 +274,26 @@ const menuItems = [
     category: 'Soup',
     tags: ['clam', 'creamy'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Size',
+        isMultiSelect: false,
+        options: [
+          { name: 'Cup', price: 0 },
+          { name: 'Bowl', price: 2.00 }
+        ]
+      },
+      {
+        name: 'Toppings',
+        isMultiSelect: true,
+        options: [
+          { name: 'Oyster Crackers', price: 0 },
+          { name: 'Bacon Bits', price: 1.00 },
+          { name: 'Fresh Herbs', price: 0.50 }
+        ]
+      }
+    ]
   },
 
   // ==================== ETHIOPIA RESTAURANTS ====================
@@ -187,9 +313,18 @@ const menuItems = [
         name: 'Spice Level',
         isMultiSelect: false,
         options: [
-          { name: 'Mild', price: 1.00 },
-          { name: 'Medium', price: 1.50 },
-          { name: 'Extra Spicy', price: 2.50 }
+          { name: 'Mild', price: 0 },
+          { name: 'Medium', price: 0 },
+          { name: 'Extra Spicy', price: 0 }
+        ]
+      },
+      {
+        name: 'Injera Type',
+        isMultiSelect: false,
+        options: [
+          { name: 'Regular', price: 0 },
+          { name: 'Extra Soft', price: 20 },
+          { name: 'Gluten-Free', price: 30 }
         ]
       }
     ]
@@ -203,7 +338,20 @@ const menuItems = [
     category: 'Vegetarian',
     tags: ['vegan', 'lentils', 'fasting'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Dish Selection',
+        isMultiSelect: true,
+        options: [
+          { name: 'Misir Wat (Red Lentil)', price: 0 },
+          { name: 'Kik Alicha (Yellow Split Pea)', price: 0 },
+          { name: 'Gomen (Collard Greens)', price: 0 },
+          { name: 'Atakilt Wat (Cabbage)', price: 0 },
+          { name: 'Fosolia (Green Beans)', price: 0 }
+        ]
+      }
+    ]
   },
   {
     name: 'Shiro',
@@ -214,7 +362,18 @@ const menuItems = [
     category: 'Stews',
     tags: ['chickpea', 'vegan'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Consistency',
+        isMultiSelect: false,
+        options: [
+          { name: 'Regular', price: 0 },
+          { name: 'Extra Thick', price: 0 },
+          { name: 'Extra Spicy', price: 0 }
+        ]
+      }
+    ]
   },
 
   // Yod Abyssinia
@@ -233,8 +392,18 @@ const menuItems = [
         name: 'Preparation',
         isMultiSelect: false,
         options: [
-          { name: 'Raw (Traditional)', price: 1.00 },
-          { name: 'Lightly Cooked', price: 1.50 }
+          { name: 'Raw (Traditional)', price: 0 },
+          { name: 'Lightly Cooked', price: 0 },
+          { name: 'Well Cooked', price: 0 }
+        ]
+      },
+      {
+        name: 'Add-ons',
+        isMultiSelect: true,
+        options: [
+          { name: 'Extra Spice', price: 20 },
+          { name: 'Ayib (Cheese)', price: 30 },
+          { name: 'Gomen (Greens)', price: 25 }
         ]
       }
     ]
@@ -248,7 +417,26 @@ const menuItems = [
     category: 'Traditional',
     tags: ['beef', 'sautéed'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Meat Cut',
+        isMultiSelect: false,
+        options: [
+          { name: 'Regular', price: 0 },
+          { name: 'Premium Cut', price: 50 }
+        ]
+      },
+      {
+        name: 'Spice Level',
+        isMultiSelect: false,
+        options: [
+          { name: 'Mild', price: 0 },
+          { name: 'Medium', price: 0 },
+          { name: 'Spicy', price: 0 }
+        ]
+      }
+    ]
   },
   {
     name: 'Tej',
@@ -259,7 +447,26 @@ const menuItems = [
     category: 'Beverages',
     tags: ['alcoholic', 'honey'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Size',
+        isMultiSelect: false,
+        options: [
+          { name: 'Small (250ml)', price: 0 },
+          { name: 'Medium (500ml)', price: 80 },
+          { name: 'Large (1L)', price: 140 }
+        ]
+      },
+      {
+        name: 'Sweetness',
+        isMultiSelect: false,
+        options: [
+          { name: 'Regular', price: 0 },
+          { name: 'Extra Sweet', price: 20 }
+        ]
+      }
+    ]
   },
 
   // Kategna Restaurant
@@ -272,7 +479,28 @@ const menuItems = [
     category: 'Vegetarian',
     tags: ['vegan', 'fasting'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Dish Selection',
+        isMultiSelect: true,
+        options: [
+          { name: 'Shiro', price: 0 },
+          { name: 'Misir Wat', price: 0 },
+          { name: 'Atakilt Wat', price: 0 },
+          { name: 'Fosolia', price: 0 },
+          { name: 'Gomen', price: 0 }
+        ]
+      },
+      {
+        name: 'Injera Quantity',
+        isMultiSelect: false,
+        options: [
+          { name: 'Standard', price: 0 },
+          { name: 'Extra', price: 30 }
+        ]
+      }
+    ]
   },
   {
     name: 'Misir Wat',
@@ -283,7 +511,18 @@ const menuItems = [
     category: 'Stews',
     tags: ['lentils', 'spicy'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Spice Level',
+        isMultiSelect: false,
+        options: [
+          { name: 'Mild', price: 0 },
+          { name: 'Medium', price: 0 },
+          { name: 'Extra Spicy', price: 0 }
+        ]
+      }
+    ]
   },
   {
     name: 'Gomen',
@@ -294,7 +533,18 @@ const menuItems = [
     category: 'Vegetables',
     tags: ['greens', 'healthy'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Add-ons',
+        isMultiSelect: true,
+        options: [
+          { name: 'Extra Garlic', price: 10 },
+          { name: 'Spicy Peppers', price: 15 },
+          { name: 'Ayib (Cheese)', price: 25 }
+        ]
+      }
+    ]
   },
 
   // Lucy Lounge
@@ -307,7 +557,26 @@ const menuItems = [
     category: 'Fusion',
     tags: ['beef', 'modern'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Cooking Style',
+        isMultiSelect: false,
+        options: [
+          { name: 'Stir-Fried', price: 0 },
+          { name: 'Grilled', price: 0 }
+        ]
+      },
+      {
+        name: 'Sauce Choice',
+        isMultiSelect: false,
+        options: [
+          { name: 'Traditional', price: 0 },
+          { name: 'Teriyaki Fusion', price: 20 },
+          { name: 'Pepper Sauce', price: 20 }
+        ]
+      }
+    ]
   },
   {
     name: 'Avocado Salad',
@@ -318,7 +587,27 @@ const menuItems = [
     category: 'Salads',
     tags: ['avocado', 'healthy'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Add Protein',
+        isMultiSelect: false,
+        options: [
+          { name: 'None', price: 0 },
+          { name: 'Grilled Chicken', price: 50 },
+          { name: 'Beef Strips', price: 60 }
+        ]
+      },
+      {
+        name: 'Dressing',
+        isMultiSelect: false,
+        options: [
+          { name: 'Lime Vinaigrette', price: 0 },
+          { name: 'Tahini', price: 10 },
+          { name: 'Honey Mustard', price: 10 }
+        ]
+      }
+    ]
   },
   {
     name: 'Ethiopian Coffee',
@@ -330,7 +619,27 @@ const menuItems = [
     tags: ['coffee', 'traditional'],
     isAvailable: true,
     deliveryOptions: ['paid', 'fast'],
-    popularFilters: ['rating', 'new']
+    popularFilters: ['rating', 'new'],
+    options: [
+      {
+        name: 'Roast Level',
+        isMultiSelect: false,
+        options: [
+          { name: 'Light', price: 0 },
+          { name: 'Medium', price: 0 },
+          { name: 'Dark', price: 0 }
+        ]
+      },
+      {
+        name: 'Add-ons',
+        isMultiSelect: true,
+        options: [
+          { name: 'Traditional Incense', price: 20 },
+          { name: 'Popcorn', price: 15 },
+          { name: 'Sugar', price: 0 }
+        ]
+      }
+    ]
   },
 
   // ==================== ITALY RESTAURANTS ====================
@@ -344,7 +653,26 @@ const menuItems = [
     category: 'Pasta',
     tags: ['vegetarian', 'traditional'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Pasta Type',
+        isMultiSelect: false,
+        options: [
+          { name: 'Spaghetti', price: 0 },
+          { name: 'Tonnarelli', price: 1.00 },
+          { name: 'Bucatini', price: 1.00 }
+        ]
+      },
+      {
+        name: 'Cheese Level',
+        isMultiSelect: false,
+        options: [
+          { name: 'Standard', price: 0 },
+          { name: 'Extra Cheese', price: 1.50 }
+        ]
+      }
+    ]
   },
   {
     name: 'Spaghetti Carbonara',
@@ -355,7 +683,25 @@ const menuItems = [
     category: 'Pasta',
     tags: ['creamy', 'classic'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Guanciale/Pancetta',
+        isMultiSelect: false,
+        options: [
+          { name: 'Standard', price: 0 },
+          { name: 'Extra', price: 2.00 }
+        ]
+      },
+      {
+        name: 'Egg Yolk Option',
+        isMultiSelect: false,
+        options: [
+          { name: 'Mixed In', price: 0 },
+          { name: 'On Top', price: 0 }
+        ]
+      }
+    ]
   },
   {
     name: 'Tiramisu',
@@ -366,7 +712,25 @@ const menuItems = [
     category: 'Dessert',
     tags: ['coffee', 'sweet'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Coffee Strength',
+        isMultiSelect: false,
+        options: [
+          { name: 'Regular', price: 0 },
+          { name: 'Extra Strong', price: 0 }
+        ]
+      },
+      {
+        name: 'Alcohol Option',
+        isMultiSelect: false,
+        options: [
+          { name: 'With Marsala Wine', price: 1.00 },
+          { name: 'Without Alcohol', price: 0 }
+        ]
+      }
+    ]
   },
 
   // Pizza Napoletana
@@ -379,7 +743,27 @@ const menuItems = [
     category: 'Pizza',
     tags: ['vegetarian', 'traditional'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Size',
+        isMultiSelect: false,
+        options: [
+          { name: 'Small (10")', price: 0 },
+          { name: 'Medium (12")', price: 2.00 },
+          { name: 'Large (14")', price: 4.00 }
+        ]
+      },
+      {
+        name: 'Extra Toppings',
+        isMultiSelect: true,
+        options: [
+          { name: 'Extra Mozzarella', price: 1.50 },
+          { name: 'Fresh Basil', price: 0.50 },
+          { name: 'Olive Oil Drizzle', price: 0.50 }
+        ]
+      }
+    ]
   },
   {
     name: 'Diavola Pizza',
@@ -390,7 +774,27 @@ const menuItems = [
     category: 'Pizza',
     tags: ['spicy', 'meat'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Spice Level',
+        isMultiSelect: false,
+        options: [
+          { name: 'Mild', price: 0 },
+          { name: 'Medium', price: 0 },
+          { name: 'Extra Spicy', price: 0 }
+        ]
+      },
+      {
+        name: 'Cheese Options',
+        isMultiSelect: true,
+        options: [
+          { name: 'Extra Mozzarella', price: 1.50 },
+          { name: 'Parmesan', price: 1.00 },
+          { name: 'Pecorino', price: 1.00 }
+        ]
+      }
+    ]
   },
   {
     name: 'Calzone',
@@ -401,7 +805,26 @@ const menuItems = [
     category: 'Pizza',
     tags: ['stuffed', 'hearty'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Fillings',
+        isMultiSelect: true,
+        options: [
+          { name: 'Extra Ricotta', price: 1.50 },
+          { name: 'Extra Ham', price: 1.50 },
+          { name: 'Mushrooms', price: 1.00 }
+        ]
+      },
+      {
+        name: 'Sauce on Side',
+        isMultiSelect: false,
+        options: [
+          { name: 'Marinara', price: 0.50 },
+          { name: 'Garlic Butter', price: 0.50 }
+        ]
+      }
+    ]
   },
 
   // Gelateria Fiorentina
@@ -417,12 +840,23 @@ const menuItems = [
     deliveryOptions: ['paid', 'fast'],
     options: [
       {
-        name: 'Flavor',
+        name: 'Size',
         isMultiSelect: false,
         options: [
-          { name: 'Vanilla', price: 1.00 },
-          { name: 'Chocolate', price: 1.50 },
-          { name: 'Strawberry', price: 2.50 }
+          { name: 'Small (1 scoop)', price: 0 },
+          { name: 'Medium (2 scoops)', price: 2.00 },
+          { name: 'Large (3 scoops)', price: 3.50 }
+        ]
+      },
+      {
+        name: 'Flavor',
+        isMultiSelect: true,
+        options: [
+          { name: 'Vanilla', price: 0 },
+          { name: 'Chocolate', price: 0 },
+          { name: 'Strawberry', price: 0 },
+          { name: 'Pistachio', price: 0.50 },
+          { name: 'Hazelnut', price: 0.50 }
         ]
       }
     ]
@@ -436,7 +870,27 @@ const menuItems = [
     category: 'Dessert',
     tags: ['coffee', 'gelato'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Coffee Type',
+        isMultiSelect: false,
+        options: [
+          { name: 'Regular Espresso', price: 0 },
+          { name: 'Double Espresso', price: 1.00 },
+          { name: 'Decaf', price: 0 }
+        ]
+      },
+      {
+        name: 'Add-ons',
+        isMultiSelect: true,
+        options: [
+          { name: 'Whipped Cream', price: 0.50 },
+          { name: 'Chocolate Shavings', price: 0.50 },
+          { name: 'Amaretto', price: 1.50 }
+        ]
+      }
+    ]
   },
   {
     name: 'Sorbetto',
@@ -447,7 +901,27 @@ const menuItems = [
     category: 'Dessert',
     tags: ['vegan', 'fruit'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Flavor',
+        isMultiSelect: false,
+        options: [
+          { name: 'Lemon', price: 0 },
+          { name: 'Mango', price: 0 },
+          { name: 'Raspberry', price: 0 },
+          { name: 'Passion Fruit', price: 0.50 }
+        ]
+      },
+      {
+        name: 'Size',
+        isMultiSelect: false,
+        options: [
+          { name: 'Small', price: 0 },
+          { name: 'Large', price: 1.50 }
+        ]
+      }
+    ]
   },
 
   // Ristorante Venezia
@@ -460,7 +934,27 @@ const menuItems = [
     category: 'Rice',
     tags: ['seafood', 'venetian'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Seafood Selection',
+        isMultiSelect: true,
+        options: [
+          { name: 'Squid', price: 0 },
+          { name: 'Shrimp', price: 2.00 },
+          { name: 'Mussels', price: 1.50 },
+          { name: 'Clams', price: 1.50 }
+        ]
+      },
+      {
+        name: 'Consistency',
+        isMultiSelect: false,
+        options: [
+          { name: 'All\'onda (Creamy)', price: 0 },
+          { name: 'More Firm', price: 0 }
+        ]
+      }
+    ]
   },
   {
     name: 'Fritto Misto',
@@ -471,7 +965,26 @@ const menuItems = [
     category: 'Appetizer',
     tags: ['fried', 'seafood'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Dipping Sauce',
+        isMultiSelect: false,
+        options: [
+          { name: 'Aioli', price: 0 },
+          { name: 'Marinara', price: 0 },
+          { name: 'Tartar', price: 0 }
+        ]
+      },
+      {
+        name: 'Lemon Wedges',
+        isMultiSelect: false,
+        options: [
+          { name: 'With Lemon', price: 0 },
+          { name: 'Without Lemon', price: 0 }
+        ]
+      }
+    ]
   },
   {
     name: 'Tiramisu Veneziano',
@@ -483,10 +996,28 @@ const menuItems = [
     tags: ['coffee', 'cream'],
     isAvailable: true,
     deliveryOptions: ['paid', 'fast'],
-    popularFilters: ['rating', 'promo']
+    popularFilters: ['rating', 'promo'],
+    options: [
+      {
+        name: 'Alcohol Option',
+        isMultiSelect: false,
+        options: [
+          { name: 'Traditional (With Marsala)', price: 0 },
+          { name: 'Non-Alcoholic', price: 0 }
+        ]
+      },
+      {
+        name: 'Coffee Strength',
+        isMultiSelect: false,
+        options: [
+          { name: 'Regular', price: 0 },
+          { name: 'Extra Strong', price: 0 }
+        ]
+      }
+    ]
   },
 
-  // ==================== INDIA RESTAURANTS ====================
+ // ==================== INDIA RESTAURANTS ====================
   // Spice Route
   {
     name: 'Butter Chicken',
@@ -503,9 +1034,19 @@ const menuItems = [
         name: 'Spice Level',
         isMultiSelect: false,
         options: [
-          { name: 'Mild', price: 1.00 },
-          { name: 'Medium', price: 1.50 },
-          { name: 'Hot', price: 2.50 }
+          { name: 'Mild', price: 0 },
+          { name: 'Medium', price: 0 },
+          { name: 'Hot', price: 0 },
+          { name: 'Extra Hot', price: 0 }
+        ]
+      },
+      {
+        name: 'Accompaniments',
+        isMultiSelect: true,
+        options: [
+          { name: 'Naan', price: 2.50 },
+          { name: 'Rice', price: 2.00 },
+          { name: 'Raita', price: 1.00 }
         ]
       }
     ]
@@ -519,7 +1060,27 @@ const menuItems = [
     category: 'Curry',
     tags: ['lamb', 'spicy'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Spice Level',
+        isMultiSelect: false,
+        options: [
+          { name: 'Mild', price: 0 },
+          { name: 'Medium', price: 0 },
+          { name: 'Hot', price: 0 },
+          { name: 'Extra Hot', price: 0 }
+        ]
+      },
+      {
+        name: 'Cut Preference',
+        isMultiSelect: false,
+        options: [
+          { name: 'Boneless', price: 1.50 },
+          { name: 'Bone-in', price: 0 }
+        ]
+      }
+    ]
   },
   {
     name: 'Garlic Naan',
@@ -530,7 +1091,27 @@ const menuItems = [
     category: 'Bread',
     tags: ['garlic', 'side'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Quantity',
+        isMultiSelect: false,
+        options: [
+          { name: '1 Piece', price: 0 },
+          { name: '2 Pieces', price: 1.50 },
+          { name: '3 Pieces', price: 3.00 }
+        ]
+      },
+      {
+        name: 'Toppings',
+        isMultiSelect: true,
+        options: [
+          { name: 'Extra Garlic', price: 0.50 },
+          { name: 'Cheese', price: 1.00 },
+          { name: 'Herbs', price: 0.50 }
+        ]
+      }
+    ]
   },
 
   // Bombay Brasserie
@@ -543,7 +1124,26 @@ const menuItems = [
     category: 'Street Food',
     tags: ['snack', 'vegetarian'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Quantity',
+        isMultiSelect: false,
+        options: [
+          { name: '6 Pieces', price: 0 },
+          { name: '12 Pieces', price: 3.00 }
+        ]
+      },
+      {
+        name: 'Spice Level',
+        isMultiSelect: false,
+        options: [
+          { name: 'Mild', price: 0 },
+          { name: 'Medium', price: 0 },
+          { name: 'Hot', price: 0 }
+        ]
+      }
+    ]
   },
   {
     name: 'Chicken Tikka Masala',
@@ -554,7 +1154,27 @@ const menuItems = [
     category: 'Curry',
     tags: ['chicken', 'creamy'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Spice Level',
+        isMultiSelect: false,
+        options: [
+          { name: 'Mild', price: 0 },
+          { name: 'Medium', price: 0 },
+          { name: 'Hot', price: 0 }
+        ]
+      },
+      {
+        name: 'Cooking Style',
+        isMultiSelect: false,
+        options: [
+          { name: 'Creamy', price: 0 },
+          { name: 'Charred', price: 0 },
+          { name: 'Extra Creamy', price: 1.00 }
+        ]
+      }
+    ]
   },
   {
     name: 'Mango Lassi',
@@ -565,7 +1185,27 @@ const menuItems = [
     category: 'Beverage',
     tags: ['sweet', 'refreshing'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Size',
+        isMultiSelect: false,
+        options: [
+          { name: 'Small', price: 0 },
+          { name: 'Medium', price: 1.00 },
+          { name: 'Large', price: 2.00 }
+        ]
+      },
+      {
+        name: 'Sweetness',
+        isMultiSelect: false,
+        options: [
+          { name: 'Less Sweet', price: 0 },
+          { name: 'Regular', price: 0 },
+          { name: 'Extra Sweet', price: 0 }
+        ]
+      }
+    ]
   },
 
   // Dum Pukht
@@ -584,8 +1224,18 @@ const menuItems = [
         name: 'Meat Choice',
         isMultiSelect: false,
         options: [
-          { name: 'Chicken', price: 1.00 },
-          { name: 'Lamb', price: 3.00 }
+          { name: 'Chicken', price: 0 },
+          { name: 'Lamb', price: 3.00 },
+          { name: 'Vegetable', price: -2.00 }
+        ]
+      },
+      {
+        name: 'Accompaniments',
+        isMultiSelect: true,
+        options: [
+          { name: 'Raita', price: 1.00 },
+          { name: 'Mirchi Ka Salan', price: 1.50 },
+          { name: 'Baghaar-e-Baingan', price: 2.00 }
         ]
       }
     ]
@@ -599,7 +1249,27 @@ const menuItems = [
     category: 'Curry',
     tags: ['lamb', 'slow-cooked'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Spice Level',
+        isMultiSelect: false,
+        options: [
+          { name: 'Mild', price: 0 },
+          { name: 'Medium', price: 0 },
+          { name: 'Hot', price: 0 }
+        ]
+      },
+      {
+        name: 'Bone Marrow',
+        isMultiSelect: false,
+        options: [
+          { name: 'Included', price: 0 },
+          { name: 'Extra', price: 3.00 },
+          { name: 'None', price: -1.00 }
+        ]
+      }
+    ]
   },
   {
     name: 'Sheermal',
@@ -610,7 +1280,26 @@ const menuItems = [
     category: 'Bread',
     tags: ['sweet', 'saffron'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Quantity',
+        isMultiSelect: false,
+        options: [
+          { name: '1 Piece', price: 0 },
+          { name: '2 Pieces', price: 1.50 },
+          { name: '3 Pieces', price: 3.00 }
+        ]
+      },
+      {
+        name: 'Toppings',
+        isMultiSelect: true,
+        options: [
+          { name: 'Extra Saffron', price: 1.00 },
+          { name: 'Dry Fruits', price: 1.50 }
+        ]
+      }
+    ]
   },
 
   // Paradise Biryani
@@ -623,7 +1312,28 @@ const menuItems = [
     category: 'Rice',
     tags: ['signature', 'spicy'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Meat Choice',
+        isMultiSelect: false,
+        options: [
+          { name: 'Chicken', price: 0 },
+          { name: 'Lamb', price: 3.00 },
+          { name: 'Prawn', price: 4.00 }
+        ]
+      },
+      {
+        name: 'Spice Level',
+        isMultiSelect: false,
+        options: [
+          { name: 'Mild', price: 0 },
+          { name: 'Medium', price: 0 },
+          { name: 'Hot', price: 0 },
+          { name: 'Extra Hot', price: 0 }
+        ]
+      }
+    ]
   },
   {
     name: 'Haleem',
@@ -634,7 +1344,27 @@ const menuItems = [
     category: 'Stew',
     tags: ['hearty', 'traditional'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Meat Choice',
+        isMultiSelect: false,
+        options: [
+          { name: 'Chicken', price: 0 },
+          { name: 'Lamb', price: 2.00 },
+          { name: 'Beef', price: 2.50 }
+        ]
+      },
+      {
+        name: 'Toppings',
+        isMultiSelect: true,
+        options: [
+          { name: 'Fried Onions', price: 0.50 },
+          { name: 'Lemon Wedges', price: 0.25 },
+          { name: 'Ginger', price: 0.50 }
+        ]
+      }
+    ]
   },
   {
     name: 'Double Ka Meetha',
@@ -646,7 +1376,27 @@ const menuItems = [
     tags: ['sweet', 'bread'],
     isAvailable: true,
     deliveryOptions: ['paid', 'fast'],
-    popularFilters: ['rating', 'discount']
+    popularFilters: ['rating', 'discount'],
+    options: [
+      {
+        name: 'Size',
+        isMultiSelect: false,
+        options: [
+          { name: 'Small', price: 0 },
+          { name: 'Medium', price: 1.50 },
+          { name: 'Large', price: 3.00 }
+        ]
+      },
+      {
+        name: 'Toppings',
+        isMultiSelect: true,
+        options: [
+          { name: 'Extra Dry Fruits', price: 1.00 },
+          { name: 'Ice Cream', price: 2.00 },
+          { name: 'Rabdi', price: 1.50 }
+        ]
+      }
+    ]
   },
 
   // ==================== JAPAN RESTAURANTS ====================
@@ -666,9 +1416,20 @@ const menuItems = [
         name: 'Fish Selection',
         isMultiSelect: true,
         options: [
-          { name: 'Salmon', price: 1.00 },
+          { name: 'Salmon', price: 0 },
           { name: 'Tuna', price: 2.00 },
-          { name: 'Yellowtail', price: 2.00 }
+          { name: 'Yellowtail', price: 2.00 },
+          { name: 'Octopus', price: 3.00 },
+          { name: 'Sea Urchin', price: 5.00 }
+        ]
+      },
+      {
+        name: 'Portion Size',
+        isMultiSelect: false,
+        options: [
+          { name: 'Small (8 pieces)', price: 0 },
+          { name: 'Medium (12 pieces)', price: 5.00 },
+          { name: 'Large (16 pieces)', price: 8.00 }
         ]
       }
     ]
@@ -682,7 +1443,26 @@ const menuItems = [
     category: 'Specialty Roll',
     tags: ['eel', 'avocado'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Rice Type',
+        isMultiSelect: false,
+        options: [
+          { name: 'White Rice', price: 0 },
+          { name: 'Brown Rice', price: 1.00 }
+        ]
+      },
+      {
+        name: 'Add-ons',
+        isMultiSelect: true,
+        options: [
+          { name: 'Extra Eel', price: 3.00 },
+          { name: 'Spicy Mayo', price: 0.50 },
+          { name: 'Tobiko', price: 1.50 }
+        ]
+      }
+    ]
   },
   {
     name: 'Miso Soup',
@@ -693,7 +1473,26 @@ const menuItems = [
     category: 'Soup',
     tags: ['tofu', 'light'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Add-ons',
+        isMultiSelect: true,
+        options: [
+          { name: 'Extra Tofu', price: 1.00 },
+          { name: 'Mushrooms', price: 0.75 },
+          { name: 'Green Onions', price: 0.50 }
+        ]
+      },
+      {
+        name: 'Size',
+        isMultiSelect: false,
+        options: [
+          { name: 'Small', price: 0 },
+          { name: 'Large', price: 1.00 }
+        ]
+      }
+    ]
   },
 
   // Ramen Street
@@ -706,7 +1505,28 @@ const menuItems = [
     category: 'Noodles',
     tags: ['pork', 'hearty'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Noodle Firmness',
+        isMultiSelect: false,
+        options: [
+          { name: 'Soft', price: 0 },
+          { name: 'Medium', price: 0 },
+          { name: 'Firm', price: 0 }
+        ]
+      },
+      {
+        name: 'Add-ons',
+        isMultiSelect: true,
+        options: [
+          { name: 'Extra Chashu', price: 2.50 },
+          { name: 'Ajitama Egg', price: 1.50 },
+          { name: 'Corn', price: 1.00 },
+          { name: 'Bamboo Shoots', price: 1.00 }
+        ]
+      }
+    ]
   },
   {
     name: 'Shoyu Ramen',
@@ -717,7 +1537,27 @@ const menuItems = [
     category: 'Noodles',
     tags: ['chicken', 'soy'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Broth Richness',
+        isMultiSelect: false,
+        options: [
+          { name: 'Light', price: 0 },
+          { name: 'Medium', price: 0 },
+          { name: 'Rich', price: 0 }
+        ]
+      },
+      {
+        name: 'Add-ons',
+        isMultiSelect: true,
+        options: [
+          { name: 'Extra Chicken', price: 2.00 },
+          { name: 'Seaweed', price: 0.75 },
+          { name: 'Bean Sprouts', price: 0.50 }
+        ]
+      }
+    ]
   },
   {
     name: 'Gyoza',
@@ -728,7 +1568,27 @@ const menuItems = [
     category: 'Appetizer',
     tags: ['dumplings', 'pork'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Quantity',
+        isMultiSelect: false,
+        options: [
+          { name: '5 Pieces', price: 0 },
+          { name: '8 Pieces', price: 2.00 },
+          { name: '12 Pieces', price: 4.00 }
+        ]
+      },
+      {
+        name: 'Dipping Sauce',
+        isMultiSelect: false,
+        options: [
+          { name: 'Ponzu', price: 0 },
+          { name: 'Gyoza Sauce', price: 0 },
+          { name: 'Spicy Mayo', price: 0.50 }
+        ]
+      }
+    ]
   },
 
   // Izakaya Torii
@@ -741,7 +1601,29 @@ const menuItems = [
     category: 'Grilled',
     tags: ['chicken', 'skewers'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Skewer Selection',
+        isMultiSelect: true,
+        options: [
+          { name: 'Thigh (Momo)', price: 0 },
+          { name: 'Breast (Sasami)', price: 0 },
+          { name: 'Skin (Kawa)', price: 1.00 },
+          { name: 'Liver (Reba)', price: 1.00 },
+          { name: 'Meatballs (Tsukune)', price: 1.50 }
+        ]
+      },
+      {
+        name: 'Sauce',
+        isMultiSelect: false,
+        options: [
+          { name: 'Tare (Sweet Soy)', price: 0 },
+          { name: 'Shio (Salt)', price: 0 },
+          { name: 'Spicy', price: 0.50 }
+        ]
+      }
+    ]
   },
   {
     name: 'Agedashi Tofu',
@@ -752,7 +1634,27 @@ const menuItems = [
     category: 'Appetizer',
     tags: ['tofu', 'vegetarian'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Toppings',
+        isMultiSelect: true,
+        options: [
+          { name: 'Bonito Flakes', price: 0.50 },
+          { name: 'Green Onions', price: 0.25 },
+          { name: 'Ginger', price: 0.50 }
+        ]
+      },
+      {
+        name: 'Spice Level',
+        isMultiSelect: false,
+        options: [
+          { name: 'Mild', price: 0 },
+          { name: 'Medium', price: 0 },
+          { name: 'Spicy', price: 0.50 }
+        ]
+      }
+    ]
   },
   {
     name: 'Sake',
@@ -769,8 +1671,18 @@ const menuItems = [
         name: 'Type',
         isMultiSelect: false,
         options: [
-          { name: 'Junmai', price: 1.00 },
-          { name: 'Ginjo', price: 2.00 }
+          { name: 'Junmai', price: 0 },
+          { name: 'Ginjo', price: 2.00 },
+          { name: 'Daiginjo', price: 4.00 }
+        ]
+      },
+      {
+        name: 'Temperature',
+        isMultiSelect: false,
+        options: [
+          { name: 'Chilled', price: 0 },
+          { name: 'Room Temperature', price: 0 },
+          { name: 'Warm', price: 0 }
         ]
       }
     ]
@@ -786,7 +1698,28 @@ const menuItems = [
     category: 'Pancake',
     tags: ['savory', 'pork'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Main Ingredient',
+        isMultiSelect: false,
+        options: [
+          { name: 'Pork', price: 0 },
+          { name: 'Seafood', price: 2.00 },
+          { name: 'Vegetable', price: 0 }
+        ]
+      },
+      {
+        name: 'Toppings',
+        isMultiSelect: true,
+        options: [
+          { name: 'Okonomiyaki Sauce', price: 0 },
+          { name: 'Mayonnaise', price: 0 },
+          { name: 'Bonito Flakes', price: 0.50 },
+          { name: 'Seaweed', price: 0.50 }
+        ]
+      }
+    ]
   },
   {
     name: 'Hiroshima-style Okonomiyaki',
@@ -797,7 +1730,27 @@ const menuItems = [
     category: 'Pancake',
     tags: ['noodles', 'layered'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Noodle Type',
+        isMultiSelect: false,
+        options: [
+          { name: 'Udon', price: 0 },
+          { name: 'Soba', price: 0 },
+          { name: 'Yakisoba', price: 1.00 }
+        ]
+      },
+      {
+        name: 'Add-ons',
+        isMultiSelect: true,
+        options: [
+          { name: 'Extra Egg', price: 1.00 },
+          { name: 'Cheese', price: 1.50 },
+          { name: 'Kimchi', price: 1.00 }
+        ]
+      }
+    ]
   },
   {
     name: 'Takoyaki',
@@ -809,7 +1762,27 @@ const menuItems = [
     tags: ['octopus', 'fried'],
     isAvailable: true,
     deliveryOptions: ['paid', 'fast'],
-    popularFilters: ['promo', 'new']
+    popularFilters: ['promo', 'new'],
+    options: [
+      {
+        name: 'Quantity',
+        isMultiSelect: false,
+        options: [
+          { name: '6 Pieces', price: 0 },
+          { name: '12 Pieces', price: 3.00 }
+        ]
+      },
+      {
+        name: 'Toppings',
+        isMultiSelect: true,
+        options: [
+          { name: 'Takoyaki Sauce', price: 0 },
+          { name: 'Mayonnaise', price: 0 },
+          { name: 'Bonito Flakes', price: 0.50 },
+          { name: 'Seaweed', price: 0.50 }
+        ]
+      }
+    ]
   },
 
   // ==================== MEXICO RESTAURANTS ====================
@@ -829,8 +1802,17 @@ const menuItems = [
         name: 'Quantity',
         isMultiSelect: false,
         options: [
-          { name: '3 Tacos', price: 1.00 },
-          { name: '5 Tacos', price: 2.00 }
+          { name: '3 Tacos', price: 0 },
+          { name: '5 Tacos', price: 3.00 }
+        ]
+      },
+      {
+        name: 'Toppings',
+        isMultiSelect: true,
+        options: [
+          { name: 'Extra Pineapple', price: 0.50 },
+          { name: 'Guacamole', price: 1.50 },
+          { name: 'Queso Fresco', price: 1.00 }
         ]
       }
     ]
@@ -844,7 +1826,28 @@ const menuItems = [
     category: 'Quesadilla',
     tags: ['cheese', 'grilled'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Filling',
+        isMultiSelect: false,
+        options: [
+          { name: 'Cheese', price: 0 },
+          { name: 'Chicken', price: 1.50 },
+          { name: 'Beef', price: 2.00 },
+          { name: 'Mushroom', price: 1.00 }
+        ]
+      },
+      {
+        name: 'Add-ons',
+        isMultiSelect: true,
+        options: [
+          { name: 'Sour Cream', price: 0.50 },
+          { name: 'Guacamole', price: 1.50 },
+          { name: 'Pico de Gallo', price: 0.75 }
+        ]
+      }
+    ]
   },
   {
     name: 'Horchata',
@@ -855,7 +1858,27 @@ const menuItems = [
     category: 'Beverage',
     tags: ['sweet', 'refreshing'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Size',
+        isMultiSelect: false,
+        options: [
+          { name: 'Small', price: 0 },
+          { name: 'Medium', price: 1.00 },
+          { name: 'Large', price: 2.00 }
+        ]
+      },
+      {
+        name: 'Sweetness',
+        isMultiSelect: false,
+        options: [
+          { name: 'Less Sweet', price: 0 },
+          { name: 'Regular', price: 0 },
+          { name: 'Extra Sweet', price: 0 }
+        ]
+      }
+    ]
   },
 
   // La Casa de las Enchiladas
@@ -868,7 +1891,27 @@ const menuItems = [
     category: 'Enchiladas',
     tags: ['chicken', 'green sauce'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Filling',
+        isMultiSelect: false,
+        options: [
+          { name: 'Chicken', price: 0 },
+          { name: 'Cheese', price: 0 },
+          { name: 'Beef', price: 1.50 }
+        ]
+      },
+      {
+        name: 'Toppings',
+        isMultiSelect: true,
+        options: [
+          { name: 'Crema', price: 0.50 },
+          { name: 'Queso Fresco', price: 1.00 },
+          { name: 'Pickled Onions', price: 0.50 }
+        ]
+      }
+    ]
   },
   {
     name: 'Mole Poblano',
@@ -879,7 +1922,27 @@ const menuItems = [
     category: 'Mole',
     tags: ['chicken', 'chocolate'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Protein',
+        isMultiSelect: false,
+        options: [
+          { name: 'Chicken', price: 0 },
+          { name: 'Pork', price: 1.00 },
+          { name: 'Vegetables', price: 0 }
+        ]
+      },
+      {
+        name: 'Spice Level',
+        isMultiSelect: false,
+        options: [
+          { name: 'Mild', price: 0 },
+          { name: 'Medium', price: 0 },
+          { name: 'Spicy', price: 0 }
+        ]
+      }
+    ]
   },
   {
     name: 'Chiles en Nogada',
@@ -890,7 +1953,27 @@ const menuItems = [
     category: 'Specialty',
     tags: ['peppers', 'stuffed'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Stuffing',
+        isMultiSelect: false,
+        options: [
+          { name: 'Traditional Picadillo', price: 0 },
+          { name: 'Vegetarian', price: 0 },
+          { name: 'Seafood', price: 2.00 }
+        ]
+      },
+      {
+        name: 'Sauce',
+        isMultiSelect: false,
+        options: [
+          { name: 'Walnut Cream', price: 0 },
+          { name: 'Almond Cream', price: 0 },
+          { name: 'Cashew Cream', price: 0 }
+        ]
+      }
+    ]
   },
 
   // Mariscos Jalisco
@@ -903,9 +1986,29 @@ const menuItems = [
     category: 'Tacos',
     tags: ['shrimp', 'fried'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Quantity',
+        isMultiSelect: false,
+        options: [
+          { name: '2 Tacos', price: 0 },
+          { name: '3 Tacos', price: 3.00 }
+        ]
+      },
+      {
+        name: 'Sauce',
+        isMultiSelect: false,
+        options: [
+          { name: 'Chipotle', price: 0 },
+          { name: 'Avocado', price: 0 },
+          { name: 'Mango Habanero', price: 0.50 }
+        ]
+      }
+    ]
   },
-  {
+   // Mariscos Jalisco
+   {
     name: 'Ceviche',
     description: 'Fresh raw fish cured in citrus juices with spices',
     price: 13.99,
@@ -914,7 +2017,38 @@ const menuItems = [
     category: 'Seafood',
     tags: ['raw', 'citrus'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Seafood Type',
+        isMultiSelect: false,
+        options: [
+          { name: 'Shrimp', price: 0 },
+          { name: 'Fish', price: 0 },
+          { name: 'Mixed (Shrimp+Fish)', price: 2.00 },
+          { name: 'Octopus', price: 3.00 }
+        ]
+      },
+      {
+        name: 'Style',
+        isMultiSelect: false,
+        options: [
+          { name: 'Traditional (Lime)', price: 0 },
+          { name: 'Mango-Habanero', price: 1.00 },
+          { name: 'Coconut Milk', price: 1.50 }
+        ]
+      },
+      {
+        name: 'Add-ons',
+        isMultiSelect: true,
+        options: [
+          { name: 'Avocado', price: 1.50 },
+          { name: 'Cucumber', price: 0.50 },
+          { name: 'Jicama', price: 0.75 },
+          { name: 'Tostadas', price: 1.00 }
+        ]
+      }
+    ]
   },
   {
     name: 'Aguachile',
@@ -925,7 +2059,36 @@ const menuItems = [
     category: 'Seafood',
     tags: ['shrimp', 'spicy'],
     isAvailable: true,
-    deliveryOptions: ['paid', 'fast']
+    deliveryOptions: ['paid', 'fast'],
+    options: [
+      {
+        name: 'Spice Level',
+        isMultiSelect: false,
+        options: [
+          { name: 'Mild', price: 0 },
+          { name: 'Medium', price: 0 },
+          { name: 'Extra Spicy', price: 0 }
+        ]
+      },
+      {
+        name: 'Protein',
+        isMultiSelect: false,
+        options: [
+          { name: 'Shrimp', price: 0 },
+          { name: 'Scallops', price: 3.00 },
+          { name: 'Mixed', price: 2.00 }
+        ]
+      },
+      {
+        name: 'Style',
+        isMultiSelect: false,
+        options: [
+          { name: 'Traditional Green', price: 0 },
+          { name: 'Mango', price: 1.00 },
+          { name: 'Negro (Squid Ink)', price: 2.00 }
+        ]
+      }
+    ]
   },
 
   // Pujol
@@ -938,7 +2101,36 @@ const menuItems = [
     category: 'Tasting',
     tags: ['premium', 'modern'],
     isAvailable: true,
-    deliveryOptions: ['fast', 'paid']
+    deliveryOptions: ['fast', 'paid'],
+    options: [
+      {
+        name: 'Course Selection',
+        isMultiSelect: false,
+        options: [
+          { name: '5 Courses', price: 0 },
+          { name: '7 Courses', price: 20.00 },
+          { name: '9 Courses', price: 35.00 }
+        ]
+      },
+      {
+        name: 'Dietary Restrictions',
+        isMultiSelect: true,
+        options: [
+          { name: 'Vegetarian', price: 0 },
+          { name: 'Pescatarian', price: 0 },
+          { name: 'Gluten-Free', price: 0 }
+        ]
+      },
+      {
+        name: 'Wine Pairing',
+        isMultiSelect: false,
+        options: [
+          { name: 'None', price: 0 },
+          { name: 'Mexican Wines', price: 25.00 },
+          { name: 'International Wines', price: 35.00 }
+        ]
+      }
+    ]
   },
   {
     name: 'Mole Madre',
@@ -949,7 +2141,28 @@ const menuItems = [
     category: 'Mole',
     tags: ['signature', 'aged'],
     isAvailable: true,
-    deliveryOptions: ['fast', 'paid']
+    deliveryOptions: ['fast', 'paid'],
+    options: [
+      {
+        name: 'Aging Time',
+        isMultiSelect: false,
+        options: [
+          { name: '30 Days', price: 0 },
+          { name: '60 Days', price: 5.00 },
+          { name: '90 Days', price: 8.00 }
+        ]
+      },
+      {
+        name: 'Accompaniments',
+        isMultiSelect: true,
+        options: [
+          { name: 'Blue Corn Tortillas', price: 0 },
+          { name: 'Sesame Seeds', price: 0 },
+          { name: 'Queso Fresco', price: 1.50 },
+          { name: 'Toasted Nuts', price: 2.00 }
+        ]
+      }
+    ]
   },
   {
     name: 'Taco Omakase',
@@ -959,7 +2172,37 @@ const menuItems = [
     restaurant: 'Pujol',
     category: 'Tacos',
     tags: ['premium', 'chef\'s choice'],
-    isAvailable: true
+    isAvailable: true,
+    deliveryOptions: ['fast', 'paid'],
+    options: [
+      {
+        name: 'Taco Count',
+        isMultiSelect: false,
+        options: [
+          { name: '5 Tacos', price: 0 },
+          { name: '7 Tacos', price: 10.00 },
+          { name: '9 Tacos', price: 18.00 }
+        ]
+      },
+      {
+        name: 'Protein Focus',
+        isMultiSelect: false,
+        options: [
+          { name: 'Mixed', price: 0 },
+          { name: 'Seafood', price: 5.00 },
+          { name: 'Vegetarian', price: 0 }
+        ]
+      },
+      {
+        name: 'Premium Add-ons',
+        isMultiSelect: true,
+        options: [
+          { name: 'Truffle', price: 10.00 },
+          { name: 'Caviar', price: 15.00 },
+          { name: 'Foie Gras', price: 12.00 }
+        ]
+      }
+    ]
   }
 ];
 
@@ -967,42 +2210,41 @@ async function seedMenuItems() {
   const connection = await connectDB();
   
   try {
+    // Clear existing menu items first
+    await MenuItem.deleteMany({});
+    console.log('Cleared existing menu items');
+    
     // Get all restaurants to map names to IDs
     const restaurants = await Restaurant.find({});
-    if (restaurants.length === 0) {
-      throw new Error('No restaurants found. Please seed restaurants first.');
-    }
-
-    // Create restaurant name to ID map
     const restaurantMap = {};
     restaurants.forEach(restaurant => {
       restaurantMap[restaurant.name] = restaurant._id;
     });
 
-    // Update menu items with restaurant IDs
-    const itemsToInsert = menuItems.map(item => {
+    // Map menu items to include restaurant IDs
+    const itemsToInsert = [];
+    
+    for (const item of menuItems) {
       const restaurantId = restaurantMap[item.restaurant];
       if (!restaurantId) {
-        throw new Error(`Restaurant not found: ${item.restaurant}`);
+        console.warn(`Restaurant not found: ${item.restaurant}`);
+        continue; // Skip this item if restaurant not found
       }
-      return {
+      
+      itemsToInsert.push({
         ...item,
         restaurant: restaurantId
-      };
-    });
-
-    // Clear existing menu items
-    await MenuItem.deleteMany({});
-    console.log('Cleared existing menu items');
-
-    // Insert new menu items
+      });
+    }
+    
+    // Insert menu items
     const createdItems = await MenuItem.insertMany(itemsToInsert);
     console.log(`Successfully seeded ${createdItems.length} menu items`);
     
     return createdItems;
   } catch (error) {
-    console.error('Error seeding menu items:', error.message);
-    throw error;
+    console.error('Error seeding menu items:', error);
+    throw error; // Re-throw to handle in the calling function
   } finally {
     if (require.main === module) {
       await connection.close();

@@ -1,5 +1,4 @@
 import './styles/main.css';
-import 'leaflet/dist/leaflet.css';
 
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/MainNavbar';
@@ -14,6 +13,7 @@ import AboutUs from './pages/AboutUs';
 import Favorites from './pages/Favorites';
 import CheckoutPage from './components/Checkout';
 import Orders from './pages/Orders';
+import Cart from './pages/Cart';
 
 // Restaurant Dashboard Components
 import RestaurantDashboard from './pages/restaurant/RestaurantDashboard';
@@ -30,7 +30,7 @@ import OrderManagements from './pages/admin/OrderManagement';
 import RestaurantManagement from './pages/admin/RestaurantManagement';
 import SupportManagement from './pages/admin/SupportManagement';
 import UserManagement from './pages/admin/UserManagement';
-
+import CountryDashboard from './pages/admin/CountryDashboard';
 
 
 function App() {
@@ -50,6 +50,8 @@ function App() {
           <Route path="/favorites" element={<Favorites />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/orders" element={<Orders />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/country-dashboard" element={<CountryDashboard />} />
           
           {/* Restaurant Dashboard Routes */}
           <Route path="/restaurant-dashboard/:restaurantId" element={<RestaurantDashboard />}>

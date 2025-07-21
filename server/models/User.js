@@ -13,6 +13,7 @@ const userSchema = new Schema({
     password: String,
     role: { type: String, enum: ['user', 'restaurant_owner', 'admin'], default: 'user' },
     address: String,
+    country: String, // <-- Add this line
     restaurantId: {
         type: Schema.Types.ObjectId,
         ref: 'Restaurant',

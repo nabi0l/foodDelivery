@@ -10,9 +10,14 @@ const RestaurantMenu = () => {
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [quantities, setQuantities] = useState({});
+  const [quantities, setQuantities] = useState(null);
 
   useEffect(() => {
+    if (!restaurantId) {
+      setError('No restaurant selected.');
+      setLoading(false);
+      return;
+    }
     const fetchRestaurantDetails = async () => {
       try {
         setLoading(true);
@@ -29,10 +34,10 @@ const RestaurantMenu = () => {
         if (menuRes.data) {
           setMenuItems(menuRes.data);
           // Initialize quantities for each menu item to 1
-          const initialQuantities = menuRes.data.reduce((acc, item) => {
-            acc[item._id] = 1;
-            return acc;
-          }, {});
+          const initialQuantities = {};
+          menuRes.data.forEach(item => {
+            initialQuantities[item._id] = 1;
+          });
           setQuantities(initialQuantities);
         }
 
@@ -140,8 +145,13 @@ const RestaurantMenu = () => {
       )}
 
       <h2 className="text-3xl font-bold mb-6">Menu</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {menuItems.map((item) => (
+      {!quantities ? (
+        <div className="flex justify-center py-8">
+          <FaSpinner className="animate-spin text-4xl text-blue-500" />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {menuItems.map((item) => (
           <div key={item._id} className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col">
             <div className="p-6 flex-grow">
               <h3 className="text-xl font-semibold mb-2">{item.name}</h3>
@@ -156,7 +166,7 @@ const RestaurantMenu = () => {
                   id={`quantity-${item._id}`}
                   name={`quantity-${item._id}`}
                   min="1"
-                  value={quantities[item._id] || 1}
+                  value={quantities[item._id] ?? 1}
                   onChange={(e) => handleQuantityChange(item._id, e.target.value)}
                   className="w-16 p-2 border border-gray-300 rounded-md text-center"
                 />
@@ -169,8 +179,9 @@ const RestaurantMenu = () => {
               </button>
             </div>
           </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

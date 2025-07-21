@@ -1,5 +1,6 @@
 const Order = require('../models/Order');
 const MenuItem = require('../models/MenuItem');
+const Restaurant = require('../models/Restaurant'); // Added missing import
 
 exports.getRestaurantAnalytics = async (req, res) => {
   try {
@@ -30,5 +31,21 @@ exports.getRestaurantAnalytics = async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch analytics' });
+  }
+};
+
+// Add this function or update your existing getRestaurants function
+
+exports.getRestaurants = async (req, res) => {
+  try {
+    const { country } = req.query;
+    let query = {};
+    if (country) {
+      query.country = country;
+    }
+    const restaurants = await Restaurant.find(query);
+    res.json(restaurants);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };
