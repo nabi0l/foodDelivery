@@ -1,62 +1,129 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import CartContext from './cartContext';
 
-const CartContext = createContext();
-
-export const useCart = () => useContext(CartContext);
-
+// Provider component
 export const CartProvider = ({ children }) => {
   // Initialize cart from localStorage if available
   const [cart, setCart] = useState(() => {
-    const savedCart = localStorage.getItem('cart');
-    return savedCart ? JSON.parse(savedCart) : [];
+    try {
+      const savedCart = localStorage.getItem('cart');
+      if (savedCart) {
+        const parsed = JSON.parse(savedCart);
+        // Ensure the cart has the correct structure
+        return {
+          items: Array.isArray(parsed?.items) ? parsed.items : [],
+          restaurantId: parsed?.restaurantId || null
+        };
+      }
+      return { items: [], restaurantId: null };
+    } catch (error) {
+      console.error('Error parsing cart from localStorage:', error);
+      return { items: [], restaurantId: null };
+    }
   });
 
   // Save cart to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cart));
+    try {
+      localStorage.setItem('cart', JSON.stringify(cart));
+    } catch (error) {
+      console.error('Error saving cart to localStorage:', error);
+    }
   }, [cart]);
 
-  const addToCart = (item) => {
+  const addToCart = (item, restaurantId) => {
+    if (!restaurantId && (!item || !item.restaurantId)) {
+      console.error('Cannot add to cart: No restaurant ID provided');
+      return;
+    }
+
+    const targetRestaurantId = restaurantId || item.restaurantId;
+    
     setCart(prevCart => {
-      const existingItem = prevCart.find(cartItem => cartItem.id === item.id);
-      if (existingItem) {
-        return prevCart.map(cartItem =>
-          cartItem.id === item.id
-            ? { ...cartItem, quantity: cartItem.quantity + item.quantity }
-            : cartItem
-        );
+      // Ensure prevCart has the expected structure
+      const safeCart = {
+        items: Array.isArray(prevCart?.items) ? prevCart.items : [],
+        restaurantId: prevCart?.restaurantId || null
+      };
+      
+      // If adding to an empty cart or same restaurant
+      if (!safeCart.restaurantId || safeCart.restaurantId === targetRestaurantId) {
+        const existingItem = safeCart.items.find(cartItem => cartItem.id === item.id);
+        
+        const updatedItems = existingItem
+          ? safeCart.items.map(cartItem =>
+              cartItem.id === item.id
+                ? { 
+                    ...cartItem, 
+                    quantity: cartItem.quantity + (item.quantity || 1),
+                    restaurantId: targetRestaurantId // Ensure restaurantId is set on items
+                  }
+                : cartItem
+            )
+          : [
+              ...safeCart.items, 
+              { 
+                ...item, 
+                quantity: item.quantity || 1,
+                restaurantId: targetRestaurantId // Ensure restaurantId is set on new items
+              }
+            ];
+        
+        return {
+          items: updatedItems,
+          restaurantId: targetRestaurantId
+        };
       } else {
-        return [...prevCart, item];
+        // If trying to add from a different restaurant, ask user to clear cart first
+        if (window.confirm('Your cart contains items from another restaurant. Would you like to clear your cart and add this item?')) {
+          return {
+            items: [{ 
+              ...item, 
+              quantity: item.quantity || 1,
+              restaurantId: targetRestaurantId 
+            }],
+            restaurantId: targetRestaurantId
+          };
+        }
+        return prevCart; // Keep the existing cart if user cancels
       }
     });
   };
 
   const removeFromCart = (itemId) => {
-    setCart(prevCart => prevCart.filter(item => item.id !== itemId));
+    setCart(prevCart => {
+      const updatedItems = prevCart.items.filter(item => item.id !== itemId);
+      return {
+        ...prevCart,
+        items: updatedItems,
+        restaurantId: updatedItems.length > 0 ? prevCart.restaurantId : null
+      };
+    });
   };
 
   const updateCartItemQuantity = (itemId, change) => {
-    setCart(prev =>
-      prev.map(item =>
+    setCart(prev => ({
+      ...prev,
+      items: prev.items.map(item =>
         item.id === itemId
           ? { ...item, quantity: Math.max(1, item.quantity + change) }
           : item
       )
-    );
+    }));
   };
 
-  // Only clear cart after successful payment
   const clearCart = () => {
-    setCart([]);
+    setCart({ items: [], restaurantId: null });
     localStorage.removeItem('cart');
   };
 
   const value = {
-    cart,
+    cart: cart.items || [],
+    restaurantId: cart.restaurantId,
     addToCart,
     removeFromCart,
     updateCartItemQuantity,
-    clearCart // Export the clearCart function
+    clearCart
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

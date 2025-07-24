@@ -121,66 +121,183 @@ router.delete('/item/:itemId', async (req, res) => {
 
 // Checkout route
 router.post('/checkout', async (req, res) => {
+    // Log the request with basic info (excluding sensitive data)
+    console.log('Checkout request received:', {
+        userId: req.body.userId,
+        restaurantId: req.body.restaurantId,
+        itemsCount: req.body.items?.length || 0,
+        hasAddress: !!req.body.deliveryAddress,
+        paymentMethod: req.body.paymentMethod || 'not provided'
+    });
+    
+    // Log full request body in development for debugging
+    if (process.env.NODE_ENV !== 'production') {
+        console.log('Request body:', JSON.stringify({
+            ...req.body,
+            items: req.body.items?.map(item => ({
+                name: item.name,
+                quantity: item.quantity,
+                price: item.price,
+                menuItemId: item.menuItemId
+            }))
+        }, null, 2));
+    }
+    
     const session = await mongoose.startSession();
-    session.startTransaction();
-
+    
     try {
-        const { userId, deliveryAddress, paymentMethod } = req.body;
+        await session.startTransaction();
+        const { 
+            userId, 
+            restaurantId,
+            items, 
+            totalPrice, 
+            deliveryAddress, 
+            paymentMethod, 
+            specialInstructions,
+            status
+        } = req.body;
+
+        // 1. Validate required fields with detailed error messages
+        const missingFields = [];
+        if (!userId) missingFields.push('userId');
+        if (!restaurantId) missingFields.push('restaurantId');
+        if (!deliveryAddress) missingFields.push('deliveryAddress');
+        if (!items || !Array.isArray(items) || items.length === 0) missingFields.push('items');
         
-        // 1. Get the user's cart
-        const cart = await Cart.findOne({ userId }).session(session);
-        
-        if (!cart || !cart.items || cart.items.length === 0) {
+        if (missingFields.length > 0) {
             await session.abortTransaction();
+            const errorMsg = `Missing required fields: ${missingFields.join(', ')}`;
+            console.error('Checkout validation failed:', errorMsg);
             return res.status(400).json({ 
                 success: false, 
-                message: 'Your cart is empty' 
+                message: errorMsg,
+                missingFields
             });
         }
 
-        // 2. Create a new order
-        const order = new Order({
-            userId: cart.userId,
-            restaurantId: cart.restaurant,
-            items: cart.items.map(item => ({
-                menuItemId: item.menuItemId,
-                name: item.name,
-                quantity: item.quantity,
-                price: item.price
-            })),
-            totalPrice: cart.totalPrice,
+        // Helper function to safely parse price values
+        const parsePrice = (value) => {
+            if (typeof value === 'number') return value;
+            if (typeof value === 'string') {
+                // Remove any non-numeric characters except decimal point and minus sign
+                const numericValue = parseFloat(value.toString().replace(/[^0-9.-]+/g, ''));
+                return isNaN(numericValue) ? 0 : numericValue;
+            }
+            return 0;
+        };
+
+        // 2. Process items to ensure they have required fields and proper types
+        const processedItems = items.map(item => {
+            const price = parsePrice(item.price);
+            return {
+                menuItemId: item.menuItemId || item._id || item.id,
+                name: item.name || 'Unnamed Item',
+                quantity: Math.max(1, Number(item.quantity) || 1),
+                price: price
+            };
+        });
+
+        // 3. Calculate total price if not provided
+        const calculatedTotal = processedItems.reduce(
+            (sum, item) => sum + (item.price * item.quantity), 0
+        );
+
+        // 4. Create a new order with all required fields
+        const orderData = {
+            userId,
+            restaurantId,
+            items: processedItems,
+            totalPrice: totalPrice ? parsePrice(totalPrice) : calculatedTotal,
             paymentStatus: 'pending',
             deliveryStatus: 'pending',
-            deliveryAddress: deliveryAddress || 'Not specified',
+            deliveryAddress: deliveryAddress.trim(),
             paymentMethod: paymentMethod || 'cash_on_delivery',
-            status: 'pending_payment' // Ensure status is set
-        });
-
-        // 3. Save the order
-        const savedOrder = await order.save({ session });
-
-        // 4. Clear the cart
-        await Cart.findByIdAndDelete(cart._id).session(session);
-
-        // 5. Commit the transaction
-        await session.commitTransaction();
+            specialInstructions: specialInstructions?.trim() || '',
+            status: status || 'pending_payment'  // Use provided status or default
+        };
         
-        res.status(201).json({
-            success: true,
-            message: 'Order placed successfully',
-            order: savedOrder
+        // Log the order data being saved
+        console.log('Creating order with data:', {
+            ...orderData,
+            items: orderData.items.map(item => ({
+                name: item.name,
+                quantity: item.quantity,
+                price: item.price,
+                menuItemId: item.menuItemId
+            }))
         });
+        
+        const order = new Order(orderData);
 
+        // 5. Save the order
+        let savedOrder;
+        try {
+            savedOrder = await order.save({ session });
+            console.log('Order saved successfully:', savedOrder._id);
+        } catch (saveError) {
+            await session.abortTransaction();
+            console.error('Error saving order:', saveError);
+            return res.status(500).json({ 
+                success: false, 
+                message: 'Failed to save order',
+                error: saveError.message 
+            });
+        }
+
+        // 6. Clear the cart (if it exists)
+        try {
+            const cartResult = await Cart.findOneAndDelete({ userId }).session(session);
+            if (cartResult) {
+                console.log('Cart cleared for user:', userId);
+            }
+        } catch (cartError) {
+            // Log the error but don't fail the order
+            console.warn('Warning: Could not clear cart:', cartError.message);
+        }
+
+        // 7. Commit the transaction
+        try {
+            await session.commitTransaction();
+            console.log('Transaction committed successfully');
+            
+            res.status(201).json({
+                success: true,
+                message: 'Order placed successfully',
+                orderId: savedOrder._id,
+                order: savedOrder
+            });
+        } catch (commitError) {
+            await session.abortTransaction();
+            console.error('Transaction commit failed:', commitError);
+            throw commitError; // This will be caught by the outer catch block
+        }
     } catch (error) {
-        await session.abortTransaction();
-        console.error('Checkout error:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Error processing your order',
-            error: error.message
+        try {
+            await session.abortTransaction();
+        } catch (abortError) {
+            console.error('Error aborting transaction:', abortError);
+        }
+        
+        console.error('Checkout error:', {
+            message: error.message,
+            stack: error.stack,
+            name: error.name
+        });
+        
+        res.status(500).json({ 
+            success: false, 
+            message: 'Error processing checkout',
+            error: process.env.NODE_ENV === 'production' 
+                ? 'Internal server error' 
+                : error.message
         });
     } finally {
-        session.endSession();
+        try {
+            await session.endSession();
+        } catch (sessionError) {
+            console.error('Error ending session:', sessionError);
+        }
     }
 });
 

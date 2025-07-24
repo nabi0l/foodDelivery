@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaStar, FaMotorcycle } from 'react-icons/fa';
 import axios from 'axios';
-import { useCart } from '../../context/CartContext';
+import useCart from '../../hooks/useCart';
 
 const PopularRestaurants = () => {
   const [restaurants, setRestaurants] = useState([]);
@@ -93,7 +93,9 @@ const PopularRestaurants = () => {
                   <h3 className="font-bold text-lg">{restaurant.name}</h3>
                   <div className="flex items-center bg-green-100 text-green-800 px-2 py-1 rounded text-sm">
                     <FaStar className="mr-1" />
-                    {restaurant.rating?.toFixed(1) || 'N/A'}
+                    {typeof restaurant.rating === 'number' && !isNaN(restaurant.rating)
+                      ? restaurant.rating.toFixed(1)
+                      : 'N/A'}
                   </div>
                 </div>
                 <p className="text-gray-600 text-sm mb-3 capitalize">{restaurant.cuisine?.toLowerCase() || 'Various cuisines'}</p>

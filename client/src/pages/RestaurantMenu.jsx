@@ -3,8 +3,10 @@ import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import { FaSpinner, FaExclamationCircle, FaArrowLeft, FaShoppingCart, FaStar } from 'react-icons/fa';
 import { toast } from 'react-toastify';
+import useCart from '../hooks/useCart';
 
 const RestaurantMenu = () => {
+  const { addToCart } = useCart();
   const { restaurantId } = useParams();
   const [restaurant, setRestaurant] = useState(null);
   const [menuItems, setMenuItems] = useState([]);
@@ -74,6 +76,20 @@ const RestaurantMenu = () => {
     const quantity = quantities[menuItem._id] || 1;
 
     try {
+      // Add item to local cart first
+      addToCart(
+        {
+          id: menuItem._id,
+          menuItemId: menuItem._id,
+          name: menuItem.name,
+          price: menuItem.price,
+          quantity,
+          restaurantId: menuItem.restaurantId
+        },
+        menuItem.restaurantId
+      );
+      
+      // Then sync with server
       const response = await axios.post('http://localhost:5000/api/cart',
         {
           userId,

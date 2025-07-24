@@ -1,10 +1,9 @@
 import React from 'react';
 import Checkout from '../components/Checkout';
-import { useCart } from '../context/CartContext';
 
 const CheckoutPage = () => {
-  const { cart } = useCart();
-  return <Checkout cart={cart} />;
+  // The Checkout component now gets cart data directly from the CartContext
+  return <Checkout />;
 };
 
 export default CheckoutPage;

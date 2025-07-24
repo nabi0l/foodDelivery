@@ -35,29 +35,66 @@ const AuthPage = ({ initialMode = 'login' }) => {
     e.preventDefault();
     setError('');
     setLoading(true);
+    
+    // Basic validation
+    if (!email || !password) {
+      setError('Please fill in all fields');
+      setLoading(false);
+      return;
+    }
+    
     try {
       if (isLogin) {
         // Login logic
-        const response = await axios.post('/api/user/login', { email, password });
-        localStorage.setItem('token', response.data.token);
-        if (response.data.user?.restaurantId) {
-          localStorage.setItem('restaurantId', response.data.user.restaurantId);
+        console.log('Attempting login with:', { email, password });
+        const response = await axios.post('http://localhost:5000/api/user/login', 
+          { email, password },
+          { 
+            headers: { 'Content-Type': 'application/json' },
+            validateStatus: (status) => status < 500 // Resolve promise for all status codes < 500
+          }
+        );
+        
+        console.log('Login response:', response);
+        
+        if (response.status !== 200) {
+          throw new Error(response.data?.message || 'Login failed');
         }
-        const role = response.data.user?.role;
-        if (role) {
-          localStorage.setItem('role', role);
+        
+        const { token, user } = response.data;
+        
+        // Store user data in local storage
+        localStorage.setItem('token', token);
+        if (user) {
+          localStorage.setItem('userId', user._id || user.id);
+          if (user.role) {
+            localStorage.setItem('role', user.role);
+          }
+          if (user.restaurantId) {
+            localStorage.setItem('restaurantId', user.restaurantId);
+          }
         }
+        
+        // Handle redirection based on user role
+        const role = user?.role;
         if (role === 'admin') {
           navigate('/admin-dashboard');
         } else if (role === 'restaurant_owner') {
-          const restaurantId = response.data.user?.restaurantId;
+          const restaurantId = user?.restaurantId;
           if (restaurantId) {
             navigate(`/restaurant-dashboard/${restaurantId}`);
           } else {
             navigate('/restaurant-dashboard/home');
           }
         } else {
-          navigate('/');
+          // For regular users, check if they were redirected from checkout
+          const fromCheckout = localStorage.getItem('fromCheckout');
+          if (fromCheckout) {
+            localStorage.removeItem('fromCheckout');
+            navigate('/checkout');
+          } else {
+            navigate('/');
+          }
         }
       } else {
         // Signup logic
@@ -66,11 +103,46 @@ const AuthPage = ({ initialMode = 'login' }) => {
           setLoading(false);
           return;
         }
-        await axios.post('/api/user/register', { name, email, password });
+        const registerResponse = await axios.post('http://localhost:5000/api/user/register', 
+          { name, email, password, address: 'Default address' },
+          { 
+            headers: { 'Content-Type': 'application/json' },
+            validateStatus: (status) => status < 500
+          }
+        );
+        
+        if (registerResponse.status !== 201) {
+          throw new Error(registerResponse.data?.message || 'Registration failed');
+        }
         navigate('/');
       }
-    } catch (err) {
-      setError(err.response?.data?.message || (isLogin ? 'Login failed' : 'Registration failed'));
+    } catch (error) {
+      console.error('Auth error:', error);
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        console.error('Response data:', error.response.data);
+        console.error('Response status:', error.response.status);
+        console.error('Response headers:', error.response.headers);
+        
+        if (error.response.status === 400) {
+          setError(error.response.data?.message || (isLogin ? 'Invalid email or password' : 'Registration failed'));
+        } else if (error.response.status === 401) {
+          setError('Unauthorized. Please check your credentials.');
+        } else if (error.response.status === 500) {
+          setError('Server error. Please try again later.');
+        } else {
+          setError(error.response.data?.message || `An error occurred during ${isLogin ? 'login' : 'registration'}`);
+        }
+      } else if (error.request) {
+        // The request was made but no response was received
+        console.error('No response received:', error.request);
+        setError('No response from server. Please check your connection.');
+      } else {
+        // Something happened in setting up the request
+        console.error('Error setting up request:', error.message);
+        setError(`Error setting up ${isLogin ? 'login' : 'registration'} request. Please try again.`);
+      }
     } finally {
       setLoading(false);
     }
@@ -121,6 +193,7 @@ const AuthPage = ({ initialMode = 'login' }) => {
                 type="text"
                 placeholder="John Doe"
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-300 focus:border-transparent transition-all"
+                autoComplete="new-password"
                 value={name}
                 onChange={e => setName(e.target.value)}
                 required
@@ -134,6 +207,7 @@ const AuthPage = ({ initialMode = 'login' }) => {
               type="email"
               placeholder="you@example.com"
               className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-300 focus:border-transparent transition-all"
+              autoComplete="username"
               value={email}
               onChange={e => setEmail(e.target.value)}
               required
@@ -153,6 +227,7 @@ const AuthPage = ({ initialMode = 'login' }) => {
               type="password"
               placeholder="••••••••"
               className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-300 focus:border-transparent transition-all"
+              autoComplete={isLogin ? 'current-password' : 'new-password'}
               value={password}
               onChange={e => setPassword(e.target.value)}
               required
@@ -166,6 +241,7 @@ const AuthPage = ({ initialMode = 'login' }) => {
                 type="password"
                 placeholder="••••••••"
                 className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-300 focus:border-transparent transition-all"
+                autoComplete="new-password"
                 value={confirmPassword}
                 onChange={e => setConfirmPassword(e.target.value)}
                 required

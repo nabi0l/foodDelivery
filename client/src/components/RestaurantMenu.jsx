@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useCart } from '../context/CartContext';
+import useCart from '../hooks/useCart';
 import { FaStar, FaClock, FaMapMarkerAlt, FaPlus, FaMinus, FaShoppingCart, FaUtensils } from 'react-icons/fa';
 import axios from 'axios';
 
@@ -218,9 +218,11 @@ const RestaurantMenu = () => {
       quantity,
       customizations: selectedCustomizations,
       image: item.image,
-      restaurantId: restaurant.id,
+      restaurantId: restaurant._id,  // Changed from restaurant.id to restaurant._id
       restaurantName: restaurant.name
     };
+    
+    console.log('Adding to cart:', cartItem);
 
     addToCartContext(cartItem);
     setQuantities(prev => ({ ...prev, [item.id]: 0 }));
@@ -583,18 +585,17 @@ const RestaurantMenu = () => {
           ) : (
             <>
               <div className="max-h-64 overflow-y-auto mb-4 space-y-4">
-                {cart.map(cartItem => (
-                  <div key={cartItem.id} className="flex justify-between items-start border-b border-gray-100 pb-4">
+                {cart.map((cartItem, cartIdx) => (
+                  <div key={cartItem.id || cartIdx} className="flex justify-between items-start border-b border-gray-100 pb-4">
                     <div className="flex-1">
                       <div className="flex justify-between">
                         <h4 className="font-medium">{cartItem.name}</h4>
-                        <span>${(cartItem.price * cartItem.quantity).toFixed(2)}</span>
+                        <span>${calculateItemTotal(cartItem)}</span>
                       </div>
-                      
                       {cartItem.customizations?.length > 0 && (
                         <div className="mt-1 text-sm text-gray-500">
                           {cartItem.customizations.map((customization, idx) => (
-                            <div key={`${cartItem.id}-${customization.id || idx}`}>
+                            <div key={customization.id || `${cartItem.id}-${idx}`}> 
                               <span className="font-medium">{customization.name}: </span>
                               {customization.options ? (
                                 <span>{customization.options.map(opt => opt.name).join(', ')}</span>
@@ -605,7 +606,6 @@ const RestaurantMenu = () => {
                           ))}
                         </div>
                       )}
-                      
                       <div className="flex items-center mt-2">
                         <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
                           <button 
@@ -635,28 +635,13 @@ const RestaurantMenu = () => {
                   </div>
                 ))}
               </div>
-              
-              <div className="border-t border-gray-200 pt-4">
-                <div className="flex justify-between items-center mb-4">
-                  <span className="font-medium">Subtotal</span>
-                  <span className="font-semibold">${calculateCartTotal()}</span>
-                </div>
-                <div className="flex justify-between items-center mb-4">
-                  <span className="text-sm text-gray-500">Delivery Fee</span>
-                  <span className="text-sm">${restaurant.deliveryFee}</span>
-                </div>
-                {/**cart float the unique one */}
-                <div className="flex justify-between items-center text-lg font-bold mb-4">
-                  <span>Total</span>
-                  <span>${(parseFloat(calculateCartTotal()) + parseFloat(restaurant.deliveryFee.replace(/[^0-9.-]+/g,""))).toFixed(2)}</span>
-                </div>
-                <button
-                  className="w-full bg-red-600 text-white py-3 rounded-lg font-medium hover:bg-red-700 transition-colors"
-                  onClick={() => _navigate('/cart')}
-                >
-                  Proceed to Checkout
-                </button>
-              </div>
+              {/* Add back Proceed to Checkout button only */}
+              <button
+                className="w-full bg-red-600 text-white py-3 rounded-lg font-medium hover:bg-red-700 transition-colors mt-4"
+                onClick={() => _navigate('/cart')}
+              >
+                Proceed to Checkout
+              </button>
             </>
           )}
         </div>
